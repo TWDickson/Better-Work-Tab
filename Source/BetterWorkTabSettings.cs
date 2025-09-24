@@ -17,12 +17,6 @@ namespace Better_Work_Tab
         public static bool enableSkillOverlayFeature = true;
         public static bool enableAutoAssignFeature = true;
 
-        // This rule ensures at least one colonist is assigned to a specific work type at a given priority
-        public static Dictionary<WorkTypeDef, int> rule_AlwaysHaveOneByWorkType = new Dictionary<WorkTypeDef, int>();
-
-        // This rule assigns all available colonists to a specific work type at a given priority
-        public static Dictionary<WorkTypeDef, int> rule_AlwaysAssignAllByWorkType = new Dictionary<WorkTypeDef, int>();
-
         //These colors are used on skill numbers in the work tab
         public static Color Color_VeryLowSkill = new Color(0.82f, 0.25f, 0.25f);
         public static Color Color_LowSkill = new Color(0.95f, 0.75f, 0.20f);
@@ -50,52 +44,52 @@ namespace Better_Work_Tab
         public static Color Color_BestPawnForSkillSquare = new Color(0.35f, 0.85f, 0.35f);
 
 
-        public static List<WorkAssignmentRuleset> SavedRulesets = new List<WorkAssignmentRuleset>{
+        public static List<WorkAssignmentRulesetDef> SavedRulesets = new List<WorkAssignmentRulesetDef>{
 
-                new WorkAssignmentRuleset("Vanilla Starting Pawn", new List<WorkAssignmentParameters>()
-                {
-                   new WorkAssignmentParameters("Highest Skill", 3, hasHighestSkill: true, randomIfMultiple: true),
-                   new WorkAssignmentParameters("Skills > 5", 3, skillLevelGreaterThan: 5),
-                   new WorkAssignmentParameters("Always Assigns", 3, isNaturalAlwaysAssign: true),
+                //new WorkAssignmentRulesetDef("Vanilla Starting Pawn", new List<WorkAssignmentParameters>()
+                //{
+                //   new WorkAssignmentParameters("Highest Skill", 3, hasHighestSkill: true, randomIfMultiple: true),
+                //   new WorkAssignmentParameters("Skills > 5", 3, skillLevelGreaterThan: 5),
+                //   new WorkAssignmentParameters("Always Assigns", 3, isNaturalAlwaysAssign: true),
 
-                }),
-
-
-                new WorkAssignmentRuleset("Vanilla New Pawn", new List<WorkAssignmentParameters>()
-                {
-                   new WorkAssignmentParameters("Top 6", 3, isTopXSkill: 6),
-                   new WorkAssignmentParameters("Always Assigns", 3, isNaturalAlwaysAssign: true),
-
-                }),
+                //}),
 
 
-                new WorkAssignmentRuleset("BWT Default", new List<WorkAssignmentParameters>()
-                {
-                    new WorkAssignmentParameters("Always Firefight", 1, worktype: WorkTypeDefOf.Firefighter),
-                    new WorkAssignmentParameters("Best Doc", 1, worktype: WorkTypeDefOf.Doctor, hasHighestSkill: true),
+                //new WorkAssignmentRulesetDef("Vanilla New Pawn", new List<WorkAssignmentParameters>()
+                //{
+                //   new WorkAssignmentParameters("Top 6", 3, isTopXSkill: 6),
+                //   new WorkAssignmentParameters("Always Assigns", 3, isNaturalAlwaysAssign: true),
 
-                    new WorkAssignmentParameters("HaulUrg if able", 2, worktypeDefNameIgnoreIfNonexistant:"HaulUrgently"),
-                    new WorkAssignmentParameters("Childcare", 2, worktype: WorkTypeDefOf.Childcare, hasChildOnMap: true),
-                    new WorkAssignmentParameters("Passion 2", 2, passionLevel: 2),
+                //}),
 
-                    new WorkAssignmentParameters("Always haul", 3, worktype: WorkTypeDefOf.Hauling),
-                    new WorkAssignmentParameters("Passion 1", 3, passionLevel: 1),
-                    new WorkAssignmentParameters("Top 6", 3, isTopXSkill: 6),
-                    new WorkAssignmentParameters("Always Assigns", 3, isNaturalAlwaysAssign: true),
-                }),
 
-                new WorkAssignmentRuleset("Best Pawn to 1", new List<WorkAssignmentParameters>()
-                {
-                    new WorkAssignmentParameters("Best to 1", 1, hasHighestSkill: true),
-                }),
+                //new WorkAssignmentRulesetDef("BWT Default", new List<WorkAssignmentParameters>()
+                //{
+                //    new WorkAssignmentParameters("Always Firefight", 1, worktype: WorkTypeDefOf.Firefighter),
+                //    new WorkAssignmentParameters("Best Doc", 1, worktype: WorkTypeDefOf.Doctor, hasHighestSkill: true),
 
-                new WorkAssignmentRuleset("Set all to 0", new List<WorkAssignmentParameters>()
-                {
-                    new WorkAssignmentParameters("Reset", 0),
-                })
+                //    new WorkAssignmentParameters("HaulUrg if able", 2, worktype: DefDatabase<WorkTypeDef>.GetNamedSilentFail("HaulUrgently")),
+                //    new WorkAssignmentParameters("Childcare", 2, worktype: WorkTypeDefOf.Childcare, hasChildOnMap: true),
+                //    new WorkAssignmentParameters("Passion 2", 2, passionLevel: 2),
+
+                //    new WorkAssignmentParameters("Always haul", 3, worktype: WorkTypeDefOf.Hauling),
+                //    new WorkAssignmentParameters("Passion 1", 3, passionLevel: 1),
+                //    new WorkAssignmentParameters("Top 6", 3, isTopXSkill: 6),
+                //    new WorkAssignmentParameters("Always Assigns", 3, isNaturalAlwaysAssign: true),
+                //}),
+
+                //new WorkAssignmentRulesetDef("Best Pawn to 1", new List<WorkAssignmentParameters>()
+                //{
+                //    new WorkAssignmentParameters("Best to 1", 1, hasHighestSkill: true),
+                //}),
+
+                //new WorkAssignmentRulesetDef("Set all to 0", new List<WorkAssignmentParameters>()
+                //{
+                //    new WorkAssignmentParameters("Reset", 0),
+                //})
             };
 
-        public static WorkAssignmentRuleset CurrentAutoAssignRuleset = SavedRulesets[0];
+        public static WorkAssignmentRulesetDef CurrentAutoAssignRuleset = SavedRulesets.Any() ? SavedRulesets[0] : null;
 
         //Worklists are stored in a GameComponent
 
@@ -164,61 +158,67 @@ namespace Better_Work_Tab
         public Color Color_BestPawnForSkillSquare = new Color(0.35f, 0.85f, 0.35f);
 
         
-        public List<WorkAssignmentRuleset> SavedRulesets = new List<WorkAssignmentRuleset> ();
+        public List<WorkAssignmentRulesetDef> SavedRulesets = new List<WorkAssignmentRulesetDef> ();
+        public List<WorkAssignmentRulesetDef> CustomRulesets = new List<WorkAssignmentRulesetDef> ();
         public void CreateDefaultRulesets()
         {
-            SavedRulesets = new List<WorkAssignmentRuleset>{
+            //SavedRulesets = new List<WorkAssignmentRuleset>{
 
-               new WorkAssignmentRuleset("Vanilla Starting Pawn", new List<WorkAssignmentParameters>()
-                {
-                   new WorkAssignmentParameters("Highest Skill", 3, hasHighestSkill: true, randomIfMultiple: true),
-                   new WorkAssignmentParameters("Skills > 5", 3, skillLevelGreaterThan: 5),
-                   new WorkAssignmentParameters("Always Assigns", 3, isNaturalAlwaysAssign: true),
+            //   new WorkAssignmentRuleset("Vanilla Starting Pawn", new List<WorkAssignmentParameters>()
+            //    {
+            //       new WorkAssignmentParameters("Highest Skill", 3, hasHighestSkill: true, randomIfMultiple: true),
+            //       new WorkAssignmentParameters("Skills > 5", 3, skillLevelGreaterThan: 5),
+            //       new WorkAssignmentParameters("Always Assigns", 3, isNaturalAlwaysAssign: true),
 
-                }),
-
-
-                new WorkAssignmentRuleset("Vanilla New Pawn", new List<WorkAssignmentParameters>()
-                {
-                   new WorkAssignmentParameters("Top 6", 3, isTopXSkill: 6),
-                   new WorkAssignmentParameters("Always Assigns", 3, isNaturalAlwaysAssign: true),
-
-                }),
+            //    }),
 
 
-                new WorkAssignmentRuleset("BWT Default", new List<WorkAssignmentParameters>()
-                {
-                    new WorkAssignmentParameters("Always Firefight", 1, worktype: WorkTypeDefOf.Firefighter),
-                     new WorkAssignmentParameters("Always Patient", 1, worktypeDefNameIgnoreIfNonexistant:"Patient"),
-                    new WorkAssignmentParameters("Always Bed Rest", 1, worktypeDefNameIgnoreIfNonexistant:"PatientBedRest"),
-                    new WorkAssignmentParameters("Always Basic", 1, worktypeDefNameIgnoreIfNonexistant:"BasicWorker"),
-                    new WorkAssignmentParameters("Best Doc", 1, worktype: WorkTypeDefOf.Doctor, hasHighestSkill: true),
+            //    new WorkAssignmentRuleset("Vanilla New Pawn", new List<WorkAssignmentParameters>()
+            //    {
+            //       new WorkAssignmentParameters("Top 6", 3, isTopXSkill: 6),
+            //       new WorkAssignmentParameters("Always Assigns", 3, isNaturalAlwaysAssign: true),
 
-                    new WorkAssignmentParameters("HaulUrg if able", 2, worktypeDefNameIgnoreIfNonexistant:"HaulUrgently"),
-                    new WorkAssignmentParameters("Childcare", 2, worktype: WorkTypeDefOf.Childcare, hasChildOnMap: true),
-                    new WorkAssignmentParameters("Passion 2", 2, passionLevel: 2),
+            //    }),
 
-                    new WorkAssignmentParameters("Always haul", 3, worktype: WorkTypeDefOf.Hauling),
-                    new WorkAssignmentParameters("Always clean", 3, worktype: WorkTypeDefOf.Cleaning),
-                    new WorkAssignmentParameters("Passion 1", 3, passionLevel: 1),
-                    new WorkAssignmentParameters("Top 6", 3, isTopXSkill: 6),
-                    //new WorkAssignmentParameters("Always Assigns", 3, isNaturalAlwaysAssign: true),
-                }),
 
-                new WorkAssignmentRuleset("Best Pawn to 1", new List<WorkAssignmentParameters>()
-                {
-                    new WorkAssignmentParameters("Best to 1", 1, hasHighestSkill: true),
-                }),
+            //    new WorkAssignmentRuleset("BWT Default", new List<WorkAssignmentParameters>()
+            //    {
+            //        new WorkAssignmentParameters("Always Firefight", 1, worktype: WorkTypeDefOf.Firefighter),
+            //         new WorkAssignmentParameters("Always Patient", 1, worktypeDefNameIgnoreIfNonexistant:"Patient"),
+            //        new WorkAssignmentParameters("Always Bed Rest", 1, worktypeDefNameIgnoreIfNonexistant:"PatientBedRest"),
+            //        new WorkAssignmentParameters("Always Basic", 1, worktypeDefNameIgnoreIfNonexistant:"BasicWorker"),
+            //        new WorkAssignmentParameters("Best Doc", 1, worktype: WorkTypeDefOf.Doctor, hasHighestSkill: true),
 
-                new WorkAssignmentRuleset("Set all to 0", new List<WorkAssignmentParameters>()
-                {
-                    new WorkAssignmentParameters("Reset", 0),
-                })
-            };
+            //        new WorkAssignmentParameters("HaulUrg if able", 2, worktypeDefNameIgnoreIfNonexistant:"HaulUrgently"),
+            //        new WorkAssignmentParameters("Childcare", 2, worktype: WorkTypeDefOf.Childcare, hasChildOnMap: true),
+            //        new WorkAssignmentParameters("Passion 2", 2, passionLevel: 2),
 
-            CurrentRuleset = SavedRulesets[0];
+            //        new WorkAssignmentParameters("Always haul", 3, worktype: WorkTypeDefOf.Hauling),
+            //        new WorkAssignmentParameters("Always clean", 3, worktype: WorkTypeDefOf.Cleaning),
+            //        new WorkAssignmentParameters("Passion 1", 3, passionLevel: 1),
+            //        new WorkAssignmentParameters("Top 6", 3, isTopXSkill: 6),
+            //        //new WorkAssignmentParameters("Always Assigns", 3, isNaturalAlwaysAssign: true),
+            //    }),
+
+            //    new WorkAssignmentRuleset("Best Pawn to 1", new List<WorkAssignmentParameters>()
+            //    {
+            //        new WorkAssignmentParameters("Best to 1", 1, hasHighestSkill: true),
+            //    }),
+
+            //    new WorkAssignmentRuleset("Set all to 0", new List<WorkAssignmentParameters>()
+            //    {
+            //        new WorkAssignmentParameters("Reset", 0),
+            //    })
+            //};
+
+            foreach (var def in DefDatabase<WorkAssignmentRulesetDef>.AllDefs)
+            {
+                SavedRulesets.Add(def);
+            }
+            if(SavedRulesets.Any())
+                CurrentRuleset = SavedRulesets[0];
         }
-        public WorkAssignmentRuleset CurrentRuleset = null;
+        public WorkAssignmentRulesetDef CurrentRuleset = null;
 
         //Worklists are stored in a GameComponent
 
@@ -252,6 +252,7 @@ namespace Better_Work_Tab
 
             Scribe_Values.Look(ref ShowUIMode_ShowSmallSkillNumbers, "CurreShowUIMode_ShowSmallSkillNumbersntAutoAssignRuleset", DefaultSettings.ShowUIMode_ShowSmallSkillNumbers);
             Scribe_Values.Look(ref ShowUIMode_ShowPawnForSkillSquare, "ShowUIMode_ShowPawnForSkillSquare", DefaultSettings.ShowUIMode_ShowPawnForSkillSquare);
+
 
         }
 

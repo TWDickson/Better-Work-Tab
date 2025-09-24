@@ -108,7 +108,6 @@ namespace Better_Work_Tab.Patches
             //    SkillOverlayState.ShowSkills = show;
             //    SoundDefOf.Tick_Tiny.PlayOneShotOnCamera();
             //}
-
             DrawAutoAssignButtons(rect);
             DrawCurrentWorkloadsButtons(rect);
         }
@@ -118,22 +117,27 @@ namespace Better_Work_Tab.Patches
             var size = new Vector2(AutoAssignButtonWidth, AutoAssignButtonHeight);
             var btn = new Rect(headerRect.xMax - size.x - size.y - AutoAssignButtonMarginX, headerRect.y + AutoAssignButtonMarginY, size.x, size.y);
 
-            if (BetterWorkTabMod.Settings.CurrentRuleset == null)
-            {
-                Log.Error("[Better Work Tab] No ruleset selected.");
-                return;
-            }
             var curRuleset = BetterWorkTabMod.Settings.CurrentRuleset;
 
-            if (Widgets.ButtonText(btn, "  "+curRuleset.Name, overrideTextAnchor: TextAnchor.MiddleLeft))
+            if (curRuleset == null)
             {
-                SoundDefOf.Tick_Low.PlayOneShotOnCamera();
-                
-                if(curRuleset.ResetBeforeApplying)
+                if (Widgets.ButtonText(btn, "  No Ruleset Selected", overrideTextAnchor: TextAnchor.MiddleLeft))
                 {
-                    WorkAssignmentRuleset.SetAllToZero();
+                    
                 }
-                curRuleset.ApplyAutoAssignments();
+            }
+            else
+            {
+                if (Widgets.ButtonText(btn, "  " + curRuleset.label.CapitalizeFirst()))
+                {
+                    SoundDefOf.Tick_Low.PlayOneShotOnCamera();
+
+                    if (curRuleset.ResetBeforeApplying)
+                    {
+                        WorkAssignmentRulesetDef.SetAllToZero();
+                    }
+                    curRuleset.ApplyAutoAssignments();
+                }
             }
 
             var btn2 = new Rect(btn.x + btn.width, btn.y, btn.height, btn.height);
@@ -143,7 +147,7 @@ namespace Better_Work_Tab.Patches
                 foreach (var ruleset in BetterWorkTabMod.Settings.SavedRulesets)
                 {
                     var localRuleset = ruleset;
-                    options.Add(new FloatMenuOption(ruleset.Name, delegate
+                    options.Add(new FloatMenuOption(ruleset.label.CapitalizeFirst(), delegate
                     {
                         BetterWorkTabMod.Settings.CurrentRuleset = localRuleset;
                         SoundDefOf.Tick_Low.PlayOneShotOnCamera();

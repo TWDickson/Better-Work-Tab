@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -40,7 +41,7 @@ namespace Better_Work_Tab.UI
         private Vector2 rightScroll;
         private string ruleNameBuffer = "";
 
-        private WorkAssignmentRuleset CurrentRuleset => Settings.CurrentRuleset;
+        private WorkAssignmentRulesetDef CurrentRuleset => Settings.CurrentRuleset;
 
         private List<WorkAssignmentRule> RulesetRules
         {
@@ -54,7 +55,8 @@ namespace Better_Work_Tab.UI
         public override void PreOpen()
         {
             base.PreOpen();
-            ruleNameBuffer = CurrentRuleset.Name;
+            if(CurrentRuleset!=null)
+                ruleNameBuffer = CurrentRuleset.label.CapitalizeFirst();
         }
         public override void DoWindowContents(Rect inRect)
         {
@@ -73,13 +75,12 @@ namespace Better_Work_Tab.UI
             rect.SplitVerticallyWithMargin(out Rect leftSide, out rightRect, 10f);
             leftSide.SplitVerticallyWithMargin(out leftRect, out midRect, 10f);
 
-
             DoRulesetListing(leftRect);
             DoRulesetRulesListing(midRect);
-            DoRuleContents(rightRect, SelectedRule);
+            DoRuleContents(rightRect);
         }
 
-        void DoRuleContents(Rect rightRect, WorkAssignmentRule rule)
+        void DoRuleContents(Rect rightRect)
         {
 
             Rect rect = rightRect;
@@ -96,15 +97,15 @@ namespace Better_Work_Tab.UI
             outRect.yMax = rect3.y - 10f;
             Widgets.DrawMenuSection(rect2);
             int num = 0;
-            foreach (var ruleset in typeof(WorkAssignmentParameters).GetConstructors().First().GetParameters())
+            foreach (var parameterSet in typeof(WorkAssignmentParameters).GetConstructors().First().GetParameters())
             {
                 num++;
             }
             Rect viewRect = new Rect(0f, 0f, outRect.width, (float)num * 32f);
             Widgets.AdjustRectsForScrollView(rect2, ref outRect, ref viewRect);
             Widgets.BeginScrollView(outRect, ref rightScroll, viewRect);
-            
-            if(rule == null)
+            Log.Message("Here 1");
+            if (SelectedRule == null)
             {
                 GUI.color = Color.gray;
                 Widgets.Label(rect3, "No rule selected");
@@ -113,13 +114,16 @@ namespace Better_Work_Tab.UI
                 return;
             }
             SelectedRule.Name = SelectedRule.Parameters.RuleName == "" ? "New Rule " + (RulesetRules.IndexOf(SelectedRule) + 1) : SelectedRule.Parameters.RuleName;
-
+            Log.Message("Here 2");
             float num2 = 32f;
 
             //Log.Message("WorkAssignmentParameters Parameters: " + typeof(WorkAssignmentParameters).GetConstructors().First().GetParameters().Count() ?? "null");
 
+            var paramCollection = typeof(WorkAssignmentParameters).GetConstructors().First().GetParameters();
+
             foreach (ParameterInfo param in typeof(WorkAssignmentParameters).GetConstructors().First().GetParameters())
             {
+                Log.Message("Here 3" + param.Name);
                 //Log.Message("Creating entry for: "+param.Name);
                 Rect rect4 = new Rect(0f, num2, outRect.width - 30f, 32f);
                 Rect rect5 = rect4;
@@ -437,10 +441,16 @@ namespace Better_Work_Tab.UI
             rect.height = 24f;
             Rect rect2 = midRect;
             rect2.yMax = rect.y - 10f;
-
             rect2.SplitHorizontally(32f, out Rect titleRect, out rect2);
-            CurrentRuleset.Name = ruleNameBuffer == "" ? "New Ruleset " + (Settings.SavedRulesets.IndexOf(CurrentRuleset) + 1) : ruleNameBuffer;
+            if(CurrentRuleset != null)
+            {
+                CurrentRuleset.label = ruleNameBuffer == "" ? "New Ruleset " + (Settings.SavedRulesets.IndexOf(CurrentRuleset) + 1) : ruleNameBuffer;
+            }
+            else
+            {
+                ruleNameBuffer = "";
 
+            }
             ruleNameBuffer = Widgets.TextField(titleRect, ruleNameBuffer, 21);
             rect2.height -= 10f;
             rect2.y += 10f;
@@ -455,6 +465,11 @@ namespace Better_Work_Tab.UI
             Widgets.DrawMenuSection(rect2);
 
 
+            if (CurrentRuleset == null || RulesetRules == null)
+            {
+                //don't bother if there is no selected ruleset
+                return;
+            }
             rect3.SplitHorizontally(rect3.height * 0.5f, out Rect topRect, out Rect bottomRect);
             if (Widgets.ButtonText(bottomRect, "Delete Rule"))
             {
@@ -472,12 +487,13 @@ namespace Better_Work_Tab.UI
                 Settings.CurrentRuleset.Rules.Add(newRule);
                 SelectedRule = newRule ;
             }
+
+           
             int num = 0;
             foreach (var ruleset in RulesetRules)
             {
                     num++;
             }
-
             Rect viewRect = new Rect(0f, 0f, outRect.width, (float)num * 32f);
             Widgets.AdjustRectsForScrollView(rect2, ref outRect, ref viewRect);
             Widgets.BeginScrollView(outRect, ref midScroll, viewRect);
@@ -542,10 +558,11 @@ namespace Better_Work_Tab.UI
 
             if (Widgets.ButtonText(rect3, "New Ruleset"))
             {
-                WorkAssignmentRuleset newRuleset = new WorkAssignmentRuleset("New Ruleset", new List<WorkAssignmentParameters>());
+                WorkAssignmentRulesetDef newRuleset = new WorkAssignmentRulesetDef("New Ruleset", new List<WorkAssignmentParameters>());
                 Settings.SavedRulesets.Add(newRuleset);
                 Settings.CurrentRuleset = newRuleset;
-                ruleNameBuffer = Settings.CurrentRuleset.Name;
+                ruleNameBuffer = Settings.CurrentRuleset.label.CapitalizeFirst();
+                DefDatabase.
             }
 
 
@@ -553,7 +570,7 @@ namespace Better_Work_Tab.UI
             int num = 0;
             foreach (var ruleset in Settings.SavedRulesets)
             {
-                if (quickSearch.filter.Matches(ruleset.Name))
+                if (quickSearch.filter.Matches(ruleset.label.CapitalizeFirst()))
                 {
                     num++;
                 }
@@ -563,12 +580,12 @@ namespace Better_Work_Tab.UI
             Widgets.BeginScrollView(outRect, ref leftScroll, viewRect);
             float num2 = 0f;
             int num3 = 0;
-            var defaultPolicy = Settings.SavedRulesets.First();
+            var defaultPolicy = Settings.SavedRulesets.Any() ? Settings.SavedRulesets.First() : null;
             foreach (var item in from x in Settings.SavedRulesets
-                                 orderby defaultPolicy != x, x.Name
-                               select x)
+                                 orderby defaultPolicy != x, x.label.CapitalizeFirst()
+                                 select x)
             {
-                if (quickSearch.filter.Matches(item.Name))
+                if (quickSearch.filter.Matches(item.label.CapitalizeFirst()))
                 {
                     Rect rect4 = new Rect(0f, num2, outRect.width, 32f);
                     Rect rect5 = rect4;
@@ -587,7 +604,7 @@ namespace Better_Work_Tab.UI
                         Widgets.DrawLightHighlight(rect4);
                     }
                     num3++;
-                    string text = item.Name;
+                    string text = item.label.CapitalizeFirst();
                     if (defaultPolicy == item)
                     {
                         text += "*".Colorize(Color.gray);
@@ -598,13 +615,13 @@ namespace Better_Work_Tab.UI
                     }
                     if (Widgets.ButtonInvisible(rect4))
                     {
-                        if (CurrentRuleset.Name == "")
+                        if (CurrentRuleset.label.CapitalizeFirst() == "")
                         {
-                            CurrentRuleset.Name = "New Ruleset " + (Settings.SavedRulesets.IndexOf(CurrentRuleset) + 1);
+                            CurrentRuleset.label = "New Ruleset " + (Settings.SavedRulesets.IndexOf(CurrentRuleset) + 1);
                         }
 
                         Settings.CurrentRuleset = item;
-                        ruleNameBuffer = Settings.CurrentRuleset.Name;
+                        ruleNameBuffer = Settings.CurrentRuleset.label.CapitalizeFirst();
                         SelectedRule = item.Rules.Any() ? item.Rules.First() : null;
                     }
                 }

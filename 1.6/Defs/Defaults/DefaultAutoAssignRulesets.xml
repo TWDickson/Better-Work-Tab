@@ -1,0 +1,15 @@
+<Defs>
+    <Better_Work_Tab.Features.Rules.WorkAssignmentRulesetDef>
+        <defName>workAssignmentRuleset</defName>
+        <label>set all to 0</label>
+        <Rules>
+            <li>
+                <Name>Reset</Name>
+                <Parameters>
+                        <Priority>0</Priority>
+                        <RuleName>All to 0</RuleName>
+                </Parameters>
+            </li>
+        </Rules>
+    </Better_Work_Tab.Features.Rules.WorkAssignmentRulesetDef>
+</Defs>

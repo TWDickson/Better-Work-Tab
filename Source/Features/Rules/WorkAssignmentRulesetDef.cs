@@ -4,24 +4,22 @@ using System.Reflection;
 using RimWorld;
 using UnityEngine;
 using Verse;
-using Better_Work_Tab.Features.Rules;
 
-namespace Better_Work_Tab.Features
+namespace Better_Work_Tab.Features.Rules
 {
     /// <summary>
     /// This class handles the automatic work assignment process for pawns based on a set of defined rules.
     /// </summary>
-    public class WorkAssignmentRuleset
+    public class WorkAssignmentRulesetDef : Def
     {
         //private readonly BetterWorkTabSettings _settings;
 
-        public string Name { get; set; }
-        public bool ResetBeforeApplying { get; private set; } = true;
-        public readonly List<WorkAssignmentRule> Rules = new List<WorkAssignmentRule>();
+        public bool ResetBeforeApplying = true;
+        public List<WorkAssignmentRule> Rules = new List<WorkAssignmentRule>();
 
-        public WorkAssignmentRuleset(string rulesetName, List<WorkAssignmentParameters> parameters, bool resetBeforeApplying = true)
+        public WorkAssignmentRulesetDef(string rulesetName, List<WorkAssignmentParameters> parameters, bool resetBeforeApplying = true)
         {
-            Name = rulesetName;
+            label = rulesetName;
             ResetBeforeApplying = resetBeforeApplying;
 
             foreach (var p in parameters)
@@ -31,16 +29,21 @@ namespace Better_Work_Tab.Features
 
         }
 
-        public WorkAssignmentRuleset(string rulesetName, List<WorkAssignmentRule> rules, bool resetBeforeApplying = true)
+        public WorkAssignmentRulesetDef(string rulesetName, List<WorkAssignmentRule> rules, bool resetBeforeApplying = true)
         {
-            Name = rulesetName;
+            label = rulesetName;
             Rules = rules;
             ResetBeforeApplying = resetBeforeApplying;
         }
 
+        public WorkAssignmentRulesetDef()
+        {
+            //default constructor for xml loading
+        }
+
         public static void SetAllToZero()
         {
-            new WorkAssignmentRuleset("Reset", new List<WorkAssignmentRule> {
+            new WorkAssignmentRulesetDef("Reset", new List<WorkAssignmentRule> {
                         new WorkAssignmentRule(new WorkAssignmentParameters("Reset", 0, allowOverwritingHigherPriority: true))
                     }).ApplyAutoAssignments();
         }
@@ -50,23 +53,25 @@ namespace Better_Work_Tab.Features
         /// </summary>
         public void ApplyAutoAssignments()
         {
+            Log.Message("Here 1");
             var map = Find.CurrentMap;
             if (map == null) return;
-
+            Log.Message("Here 2");
             Find.PlaySettings.useWorkPriorities = true;
-
+            Log.Message("Here 3");
             var pawns = map.mapPawns.FreeColonists.ToList();
             if (pawns.Count == 0) return;
-
+            Log.Message("Here 4");
             var allWorkTypes = DefDatabase<WorkTypeDef>.AllDefsListForReading.OrderBy(wt => wt.naturalPriority).Reverse().ToList();
             allWorkTypes.RemoveDuplicates();
+            Log.Message("Here 5");
 
-            
             foreach (var rule in Rules)
             {
+                Log.Message($"Applying rule: {rule.Parameters.RuleName}");
                 foreach (var worktype in allWorkTypes)
                 {
-
+                    Log.Message($"Considering work type: {worktype.defName}");
                     if (rule.Parameters.Worktype != null)
                     {
 
@@ -74,17 +79,23 @@ namespace Better_Work_Tab.Features
                         if (rule.Parameters.Worktype != worktype)
                             continue;
                     }
-                    if(rule.Parameters.WorktypeDefNameIgnoreIfNonexistant != "")
-                    {
-                        //if there's a rule that applies to only one ignorable worktype, skip all others.
-                        if (!DefDatabase<WorkTypeDef>.AllDefs.Contains(DefDatabase<WorkTypeDef>.GetNamedSilentFail(rule.Parameters.WorktypeDefNameIgnoreIfNonexistant)))
-                            continue;
-                    }
+                    Log.Message($"Passed worktype check for: {worktype.defName}");
+
+
+                    //if (rule.Parameters.WorktypeDefNameIgnoreIfNonexistant != "")
+                    //{
+                    //    //if there's a rule that applies to only one ignorable worktype, skip all others.
+                    //    if (!DefDatabase<WorkTypeDef>.AllDefs.Contains(DefDatabase<WorkTypeDef>.GetNamedSilentFail(rule.Parameters.WorktypeDefNameIgnoreIfNonexistant)))
+                    //        continue;
+                    //}
+                    //Log.Message(rule.Parameters.WorktypeDefNameIgnoreIfNonexistant == "" ? "No ignore worktype defined." : $"Ignore worktype defined: {rule.Parameters.WorktypeDefNameIgnoreIfNonexistant}");
                     List<Pawn> pawnsForThisWorktype = new List<Pawn>();
 
+                    Log.Message($"Applying rule: {rule.Parameters.RuleName} to work type: {worktype.defName}");
                     //Log.Message($"Auto-assigning work type: {worktype.defName}");
                     foreach (var pawn in pawns)
                     {
+                        Log.Message($"Considering pawn: {pawn.NameShortColored} for work type: {worktype.defName}");
                         if (pawn.workSettings == null) continue;
                         bool pawnAlreadyAssigned = pawn.workSettings.GetPriority(worktype) > 0;
                         //// Apply all rules
@@ -127,7 +138,5 @@ namespace Better_Work_Tab.Features
                 }
             }
         }
-
-
     }
 }
