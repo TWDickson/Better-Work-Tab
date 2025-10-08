@@ -3,7 +3,12 @@ using Better_Work_Tab.Features.Rules;
 using Better_Work_Tab.Features.Workloads;
 using RimWorld;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.Serialization;
+using System.Xml;
+using System.Xml.Serialization;
 using Unity.Burst.Intrinsics;
 using Unity.Mathematics;
 using UnityEngine;
@@ -102,7 +107,13 @@ namespace Better_Work_Tab
     // This contains all configurable settings for the Better Work Tab mod with reasonable defaults
     public class BetterWorkTabSettings : ModSettings
     {
-        public BetterWorkTabSettings() { }
+        public BetterWorkTabSettings()
+        {
+            LongEventHandler.ExecuteWhenFinished(() => {
+                CreateDefaultRulesets();
+                Log.Message("Finished creating defaults");
+            });
+        }
 
         // This provides master toggles for major features so users can disable parts they don't want
         public bool enableSkillOverlayFeature = true;
@@ -210,14 +221,20 @@ namespace Better_Work_Tab
             //        new WorkAssignmentParameters("Reset", 0),
             //    })
             //};
-
+            Log.Message("Setting default rules");
+            int num = 0;
             foreach (var def in DefDatabase<WorkAssignmentRulesetDef>.AllDefs)
             {
                 SavedRulesets.Add(def);
+
+                DirectXmlSaver.SaveDataObject(def, Path.Combine(Directory.GetCurrentDirectory(), "Mods", Mod.Content.FolderName, "1.6","defs","Defaults","rule" + (num++) + ".xml"));
+
             }
-            if(SavedRulesets.Any())
+            if (SavedRulesets.Any())
                 CurrentRuleset = SavedRulesets[0];
         }
+
+
         public WorkAssignmentRulesetDef CurrentRuleset = null;
 
         //Worklists are stored in a GameComponent

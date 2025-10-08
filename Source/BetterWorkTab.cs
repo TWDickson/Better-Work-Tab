@@ -21,8 +21,9 @@ namespace Better_Work_Tab
                 Log.Error($"[Better Work Tab] Harmony failed: {ex}");
             }
 
+            Log.Message("This should be being called. If it's not I'm confused.");
             Settings = GetSettings<BetterWorkTabSettings>();
-            LongEventHandler.ExecuteWhenFinished(Settings.CreateDefaultRulesets);
+            //LongEventHandler.ExecuteWhenFinished(Settings.CreateDefaultRulesets);
         }
 
         public override string SettingsCategory() => "Better Work Tab";

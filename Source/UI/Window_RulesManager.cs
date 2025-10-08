@@ -124,17 +124,12 @@ namespace Better_Work_Tab.UI
             foreach (ParameterInfo param in typeof(WorkAssignmentParameters).GetConstructors().First().GetParameters())
             {
                 Log.Message("Here 3" + param.Name);
-                //Log.Message("Creating entry for: "+param.Name);
                 Rect rect4 = new Rect(0f, num2, outRect.width - 30f, 32f);
                 Rect rect5 = rect4;
                 rect5.x += 10f;
                 num2 += 32f;
                 Rect rightPart = rect5.RightPart(0.25f);
                 string paramLabel = ("BWT_" + param.Name).Translate();
-                //using (new TextBlock(TextAnchor.MiddleLeft))
-                //{
-                //    Widgets.Label(rect5, text);
-                //}
                 GUI.color = Color.white;
                 var fontsize = Text.Font;
 
@@ -332,24 +327,6 @@ namespace Better_Work_Tab.UI
                 Text.Font = fontsize;
                 GUI.color = Color.white;
 
-                //if(param.ParameterType == typeof(float))
-                //{
-                //    var field = AccessTools.DeclaredField(typeof(WorkAssignmentParameters), param.Name.CapitalizeFirst());
-                //    float refValue = (float)field.GetValue(SelectedRule.Parameters);
-                //    Widgets.Label(rect5, text);
-                //    if (param.HasDefaultValue && refValue == (float)param.DefaultValue)
-                //    {
-                //        GUI.color = Color.gray;
-                //    }
-
-                //    string editBuffer = refValue.ToString();
-                //    DrawPlusMinusOneField(rightPart, ref refValue, ref editBuffer, param);
-                //    field.SetValue(SelectedRule.Parameters, refValue);
-
-                //    continue;
-                //}
-
-
                 if(param.ParameterType == typeof(WorkAssignmentParameters))
                 {
                     Widgets.Label(rect5, "BAHAHA YOU WANT TO DO NESTED RULES??");
@@ -363,49 +340,6 @@ namespace Better_Work_Tab.UI
 
         }
 
-
-       /* public void DefDropdown<T>(Rect rect5, ParameterInfo param, string text) where T : Def
-        {
-            var field = AccessTools.DeclaredField(typeof(WorkAssignmentParameters), param.Name.CapitalizeFirst());
-            T refValue = (T)field.GetValue(SelectedRule.Parameters) ?? null;
-            Widgets.Label(rect5, text);
-            if (Widgets.ButtonText(rect5.RightPart(0.25f), refValue?.label ?? "Unassigned"))
-            {
-                List<FloatMenuOption> defOptions = new List<FloatMenuOption>()
-                {
-                    new FloatMenuOption("Unassigned", delegate
-                    {
-                        field.SetValue(SelectedRule.Parameters, null);
-                        SoundDefOf.Tick_Tiny.PlayOneShotOnCamera();
-                    })
-                };
-                foreach (var def in DefDatabase<T>.AllDefsListForReading)
-                {
-
-                    if (def is XenotypeDef)
-                    {
-                        
-                    }
-                    else if (def is TraitDef)
-                    {
-                        var trait = def as TraitDef;
-                        defOptions.Add(new FloatMenuOption(trait.degreeDatas.First().label, delegate
-                        {
-                            field.SetValue(SelectedRule.Parameters, def);
-                            SoundDefOf.Tick_Tiny.PlayOneShotOnCamera();
-                        }));
-                    }
-                    else if(def is WorkTypeDef)
-                    {
-
-                    }
-                }
-                Find.WindowStack.Add(new FloatMenu(defOptions));
-            }
-            
-            
-        }*/
-        
         public static void DrawPlusMinusOneField(Rect rect, ref int value, ref string editBuffer, ParameterInfo param, int multiplier = 1)
         {
 
@@ -487,7 +421,6 @@ namespace Better_Work_Tab.UI
                 Settings.CurrentRuleset.Rules.Add(newRule);
                 SelectedRule = newRule ;
             }
-
            
             int num = 0;
             foreach (var ruleset in RulesetRules)
@@ -562,10 +495,7 @@ namespace Better_Work_Tab.UI
                 Settings.SavedRulesets.Add(newRuleset);
                 Settings.CurrentRuleset = newRuleset;
                 ruleNameBuffer = Settings.CurrentRuleset.label.CapitalizeFirst();
-                DefDatabase.
             }
-
-
 
             int num = 0;
             foreach (var ruleset in Settings.SavedRulesets)

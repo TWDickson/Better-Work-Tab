@@ -3,12 +3,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Remoting.Messaging;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using Verse;
 
 namespace Better_Work_Tab.Features.Workloads
 {
+    [DataContract]
     public class PawnWorkload : IExposable
     {
         public PawnWorkload(Pawn pawn)
@@ -19,8 +21,9 @@ namespace Better_Work_Tab.Features.Workloads
         public PawnWorkload() { }
 
 
-
+        [DataMember]
         Pawn owningPawn;
+        [DataMember]
         Dictionary<WorkTypeDef, int> Priorities;
 
         public void Apply()

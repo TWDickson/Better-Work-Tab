@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization;
 using RimWorld;
 using UnityEngine;
 using Verse;
@@ -13,7 +14,6 @@ namespace Better_Work_Tab.Features.Rules
     public class WorkAssignmentRulesetDef : Def
     {
         //private readonly BetterWorkTabSettings _settings;
-
         public bool ResetBeforeApplying = true;
         public List<WorkAssignmentRule> Rules = new List<WorkAssignmentRule>();
 
