@@ -15,6 +15,7 @@ namespace Better_Work_Tab.UI.RuleBuilder.State
         IntRange,
         Passion,
         Gender,
+        DevelopmentalStage,
         Trait,
         Xenotype
     }

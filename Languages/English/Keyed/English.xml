@@ -28,6 +28,9 @@
 <BWT_MoveSpeedGreaterThan>How did you find this?</BWT_MoveSpeedGreaterThan>
 <BWT_MoveSpeedLessThan>Also how did you find this??</BWT_MoveSpeedLessThan>
 <BWT_Gender>Assign if gender is</BWT_Gender>
+<BWT_TopNPercent>Assign if pawn's skill is in the top N% </BWT_TopNPercent>
+<BWT_BottomNPercent>Assign if pawn's skill is in the bottom N%</BWT_BottomNPercent>
+<BWT_DevelopmentalStage>Assign if developmental stage is</BWT_DevelopmentalStage>
 <BWT_Xenotype>Assign if Xenotype is</BWT_Xenotype>
 <BWT_RequiredTrait>Required trait</BWT_RequiredTrait>
 <BWT_AssignSimilarWorktypes>I don't want to do this one</BWT_AssignSimilarWorktypes>
@@ -57,6 +60,9 @@
 <BWT_MoveSpeedGreaterThan_Desc>You should never see this, but if you do it's because I need to update the tooltip to say 'Only assign if the pawn's move speed is greater than this number.'</BWT_MoveSpeedGreaterThan_Desc>
 <BWT_MoveSpeedLessThan_Desc>You should never see this, but if you do it's because I need to update the tooltip to say 'Only assign if the pawn's move speed is less than this number.'</BWT_MoveSpeedLessThan_Desc>
 <BWT_Gender_Desc>Only assign to pawns of this gender.</BWT_Gender_Desc>
+<BWT_TopNPercent_Desc>Only assign if pawn's skill is in the top N%.</BWT_TopNPercent_Desc>
+<BWT_BottomNPercent_Desc>Only assign if pawn's skill is in the bottom N%.</BWT_BottomNPercent_Desc>
+<BWT_DevelopmentalStage_Desc>Only assign to pawns of this developmental stage. Obeys age restriction.</BWT_DevelopmentalStage_Desc>
 <BWT_Xenotype_Desc>Only assign to pawns with this Xenotype.</BWT_Xenotype_Desc>
 <BWT_RequiredTrait_Desc>Only assign to pawns with this trait.</BWT_RequiredTrait_Desc>
 <BWT_AssignSimilarWorktypes_Desc>I don't want to do the menu for this one. But if/when I do it'll be like 'Assign this rule to worktypes that have the same relevant skill(s) as this work type.'</BWT_AssignSimilarWorktypes_Desc>

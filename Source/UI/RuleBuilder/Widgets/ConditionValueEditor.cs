@@ -35,7 +35,8 @@ namespace Better_Work_Tab.UI.RuleBuilder.Widgets
                 ConditionType.Int => DrawIntEditor(rect, condition, parameters, state),
                 ConditionType.IntRange => DrawIntRangeEditor(rect, condition, parameters, state),
                 ConditionType.Passion => DrawPassionEditor(rect, condition, parameters, state),
-                ConditionType.Gender => DrawGenderEditor(rect, condition, parameters, state),
+                ConditionType.Gender => DrawEnumEditor<Gender>(rect, condition, parameters, state),
+                ConditionType.DevelopmentalStage => DrawEnumEditor<DevelopmentalStage>(rect, condition, parameters, state),
                 ConditionType.Trait => DrawTraitEditor(rect, condition, parameters, state),
                 ConditionType.Xenotype => DrawXenotypeEditor(rect, condition, parameters, state),
                 _ => false
@@ -232,13 +233,13 @@ namespace Better_Work_Tab.UI.RuleBuilder.Widgets
             return false;
         }
 
-        private static bool DrawGenderEditor(
+        private static bool DrawEnumEditor<T>(
             Rect rect,
             ConditionInfo condition,
             WorkAssignmentParameters parameters,
-            RuleBuilderState state)
+            RuleBuilderState state) where T : struct, Enum
         {
-            var currentValue = (Gender?)ConditionRegistry.GetValue(condition.Key, parameters);
+            var currentValue = (T?)ConditionRegistry.GetValue(condition.Key, parameters);
             string label = currentValue?.ToString() ?? "BWT_Any".Translate();
 
             float buttonWidth = Mathf.Min(95f, rect.width);
@@ -261,12 +262,12 @@ namespace Better_Work_Tab.UI.RuleBuilder.Widgets
                     })
                 };
 
-                foreach (Gender gender in Enum.GetValues(typeof(Gender)))
+                foreach (T enumValue in Enum.GetValues(typeof(T)))
                 {
-                    var localGender = gender;
-                    options.Add(new FloatMenuOption(gender.ToString(), () =>
+                    var localEnumValue = enumValue;
+                    options.Add(new FloatMenuOption(enumValue.ToString(), () =>
                     {
-                        ConditionRegistry.SetValue(condition.Key, parameters, localGender);
+                        ConditionRegistry.SetValue(condition.Key, parameters, localEnumValue);
                         state.NotifyRulesModified();
                         SoundDefOf.Tick_Tiny.PlayOneShotOnCamera();
                     }));

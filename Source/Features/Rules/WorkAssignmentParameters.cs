@@ -41,6 +41,9 @@ namespace Better_Work_Tab.Features.Rules
         public Gender? Gender;
 
         [RuleParameter]
+        public DevelopmentalStage? DevelopmentalStage;
+
+        [RuleParameter]
         public bool HasHighestSkill;
 
         [RuleParameter]
@@ -90,6 +93,12 @@ namespace Better_Work_Tab.Features.Rules
         
         [RuleParameter]
         public float MoveSpeedLessThan = -1;
+
+        [RuleParameter]
+        public int TopNPercent = -1;
+
+        [RuleParameter]
+        public int BottomNPercent = -1;
 
         /// <summary>
         /// Serialization fallback when <see cref="Worktype"/> cannot be resolved.
@@ -148,7 +157,11 @@ namespace Better_Work_Tab.Features.Rules
             bool ignoreIfWorktypeNonexistent = false, 
             float moveSpeedGreaterThan = -1, 
             float moveSpeedLessThan = -1, 
-            string worktypeString = "")
+            string worktypeString = "",
+            DevelopmentalStage? developmentalStage = null,
+            int skillTopNPercent = -1,
+            int skillBottomNPercent = -1
+            )
         {
             RuleName = ruleName;
             Priority = priority;
@@ -169,6 +182,7 @@ namespace Better_Work_Tab.Features.Rules
             SkipIfAnotherPawnAssigned = skipIfAnotherPawnAssigned;
             AssignToPawnWithFewestWorkPriorities = assignToPawnWithFewestWorkPriorities;
             Gender = gender;
+            DevelopmentalStage = developmentalStage;
             IsPregnant = isPregnant;
 
             Xenotype = xenotype;
@@ -201,6 +215,8 @@ namespace Better_Work_Tab.Features.Rules
             IgnoreIfWorktypeNonexistent = ignoreIfWorktypeNonexistent;
             MoveSpeedGreaterThan = moveSpeedGreaterThan;
             MoveSpeedLessThan = moveSpeedLessThan;
+            TopNPercent = skillTopNPercent;
+            BottomNPercent = skillBottomNPercent;
         }
         public WorkAssignmentParameters() { }
 
@@ -265,6 +281,7 @@ namespace Better_Work_Tab.Features.Rules
             Scribe_Values.Look(ref SkipIfAnotherPawnAssigned, "SkipIfAnotherPawnAssigned");
             Scribe_Values.Look(ref AssignToPawnWithFewestWorkPriorities, "AssignToPawnWithFewestWorkPriorities");
             Scribe_Values.Look(ref Gender, "Gender");
+            Scribe_Values.Look(ref DevelopmentalStage, "DevelopmentalStage");
             Scribe_Values.Look(ref IsPregnant, "IsPregnant");
             Scribe_Values.Look(ref IsNaturalAlwaysAssign, "IsNaturalAlwaysAssign");
             Scribe_Values.Look(ref IsCapableOfViolence, "IsCapableOfViolence");
@@ -282,6 +299,8 @@ namespace Better_Work_Tab.Features.Rules
             Scribe_Values.Look(ref IgnoreIfWorktypeNonexistent, "IgnoreIfWorktypeNonexistent");
             Scribe_Values.Look(ref MoveSpeedGreaterThan, "MoveSpeedGreaterThan", -1f);
             Scribe_Values.Look(ref MoveSpeedLessThan, "MoveSpeedLessThan", -1f);
+            Scribe_Values.Look(ref TopNPercent, "TopNPercent", -1);
+            Scribe_Values.Look(ref BottomNPercent, "BottomNPercent", -1);
             Scribe_Collections.Look(ref ActiveConditions, "ActiveConditions", LookMode.Value);
 
 

@@ -84,6 +84,12 @@ namespace Better_Work_Tab.UI.RuleBuilder.Widgets
         {
             string label = def.Label ?? $"BWT_{def.Key}".Translate();
 
+            if (!def.IncludeIfModActive)
+            {
+                //skip adding this option if the required mod is not active
+                return;
+            }
+
             options.Add(new FloatMenuOption(label, () =>
             {
                 // Set to default value

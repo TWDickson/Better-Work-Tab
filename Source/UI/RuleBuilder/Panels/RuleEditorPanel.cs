@@ -658,6 +658,9 @@ namespace Better_Work_Tab.UI.RuleBuilder.Panels
             if (parameters.Xenotype != null)
                 result.Add(new ConditionInfo("Xenotype", ConditionType.Xenotype, parameters.Xenotype));
 
+            if (parameters.DevelopmentalStage != null)
+                result.Add(new ConditionInfo("DevelopmentalStage", ConditionType.DevelopmentalStage, parameters.DevelopmentalStage));
+
             if (parameters.IsCapableOfViolence)
                 result.Add(new ConditionInfo("IsCapableOfViolence", ConditionType.Bool, true));
 

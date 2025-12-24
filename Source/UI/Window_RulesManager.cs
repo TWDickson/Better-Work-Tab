@@ -71,7 +71,8 @@ namespace Better_Work_Tab.UI
                 { typeof(bool), (mgr, field, rowRect, valueRect, label) => mgr.DrawBoolParameter(field, rowRect, label) },
                 { typeof(int), (mgr, field, rowRect, valueRect, label) => mgr.DrawIntParameter(field, rowRect, valueRect, label) },
                 { typeof(string), (mgr, field, rowRect, valueRect, label) => mgr.DrawStringParameter(field, rowRect, valueRect, label) },
-                { typeof(Gender?), (mgr, field, rowRect, valueRect, label) => mgr.DrawGenderParameter(field, rowRect, valueRect, label) },
+                { typeof(Gender?), (mgr, field, rowRect, valueRect, label) => mgr.DrawEnumParameter<Gender>(field, rowRect, valueRect, label) },
+                { typeof(DevelopmentalStage?), (mgr, field, rowRect, valueRect, label) => mgr.DrawEnumParameter<DevelopmentalStage>(field, rowRect, valueRect, label) },
                 { typeof(WorkTypeDef), (mgr, field, rowRect, valueRect, label) => mgr.DrawWorkTypeParameter(field, rowRect, valueRect, label) },
                 { typeof(XenotypeDef), (mgr, field, rowRect, valueRect, label) => mgr.DrawXenotypeParameter(field, rowRect, valueRect, label) },
                 { typeof(Tuple<TraitDef, int>), (mgr, field, rowRect, valueRect, label) => mgr.DrawTraitParameter(field, rowRect, valueRect, label) },
@@ -293,13 +294,45 @@ namespace Better_Work_Tab.UI
             }
         }
 
-        private void DrawGenderParameter(FieldInfo field, Rect rowRect, Rect valueRect, string label)
+        //private void DrawGenderParameter(FieldInfo field, Rect rowRect, Rect valueRect, string label)
+        //{
+        //    Widgets.Label(rowRect.LeftPart(1f - ParameterValuePortion), label);
+        //    var oldColor = GUI.color;
+        //    if (uneditable) GUI.color = Color.gray;
+
+        //    Gender? value = (Gender?)field.GetValue(SelectedRule.Parameters);
+        //    if (Widgets.ButtonText(valueRect, value?.ToString() ?? "Unassigned", active: !uneditable))
+        //    {
+        //        List<FloatMenuOption> enums = new List<FloatMenuOption>()
+        //        {
+        //            new FloatMenuOption("Unassigned", delegate
+        //            {
+        //                field.SetValue(SelectedRule.Parameters, null);
+        //                SoundDefOf.Tick_Tiny.PlayOneShotOnCamera();
+        //            })
+        //        };
+
+        //        foreach (var e in Enum.GetValues(typeof(Gender)))
+        //        {
+        //            enums.Add(new FloatMenuOption(e.ToString(), delegate
+        //            {
+        //                field.SetValue(SelectedRule.Parameters, e);
+        //                SoundDefOf.Tick_Tiny.PlayOneShotOnCamera();
+        //            }));
+        //        }
+        //        Find.WindowStack.Add(new FloatMenu(enums));
+        //    }
+
+        //    GUI.color = oldColor;
+        //}
+
+        private void DrawEnumParameter<T>(FieldInfo field, Rect rowRect, Rect valueRect, string label) where T : struct, Enum
         {
             Widgets.Label(rowRect.LeftPart(1f - ParameterValuePortion), label);
             var oldColor = GUI.color;
             if (uneditable) GUI.color = Color.gray;
 
-            Gender? value = (Gender?)field.GetValue(SelectedRule.Parameters);
+            T? value = (T?)field.GetValue(SelectedRule.Parameters);
             if (Widgets.ButtonText(valueRect, value?.ToString() ?? "Unassigned", active: !uneditable))
             {
                 List<FloatMenuOption> enums = new List<FloatMenuOption>()
@@ -311,7 +344,7 @@ namespace Better_Work_Tab.UI
                     })
                 };
 
-                foreach (var e in Enum.GetValues(typeof(Gender)))
+                foreach (var e in Enum.GetValues(typeof(T)))
                 {
                     enums.Add(new FloatMenuOption(e.ToString(), delegate
                     {
@@ -512,7 +545,7 @@ namespace Better_Work_Tab.UI
             {
                 Widgets.TextFieldNumeric(midRect, ref value, ref editBuffer);
             }
-            value = Mathf.Clamp(value, -1, 4);
+            value = Mathf.Clamp(value, -1, 100);
             GUI.color = oldColor;
         }
 

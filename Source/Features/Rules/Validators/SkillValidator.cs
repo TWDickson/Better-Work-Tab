@@ -3,6 +3,7 @@ using Better_Work_Tab.Features.Rules;
 using System.Collections.Generic;
 using System.Linq;
 using Verse;
+using Unity.Mathematics;
 
 namespace Better_Work_Tab.Features.Rules.Validators
 {
@@ -132,6 +133,43 @@ namespace Better_Work_Tab.Features.Rules.Validators
                 float wtValue = pawn.skills?.AverageOfRelevantSkillsFor(wt) ?? 0f;
 
                 if (wtValue != nthBestValue)
+                    return false;
+            }
+
+            if (p.TopNPercent > -1)
+            {
+                var allWorkTypes = WorkAssignmentRule.AllWorkTypes;
+
+                var ranked = allWorkTypes
+                    .Where(w => !pawn.WorkTypeIsDisabled(w))
+                    .OrderByDescending(w => pawn.skills?.AverageOfRelevantSkillsFor(w) ?? 0f)
+                    .ToList();
+                
+                List<Pawn> topNPawns = allPawns.OrderBy(allPawns => 
+                    allPawns.skills?.AverageOfRelevantSkillsFor(wt) ?? 0f)
+                    .Take((int)(math.ceil(allPawns.Count * (p.TopNPercent / 100f))))
+                    .ToList();
+
+                if (!topNPawns.Contains(pawn))
+                    return false;
+            }
+
+            if (p.BottomNPercent > -1)
+            {
+                var allWorkTypes = WorkAssignmentRule.AllWorkTypes;
+
+                var ranked = allWorkTypes
+                    .Where(w => !pawn.WorkTypeIsDisabled(w))
+                    .OrderByDescending(w => pawn.skills?.AverageOfRelevantSkillsFor(w) ?? 0f)
+                    .ToList();
+
+                List<Pawn> topNPawns = allPawns.OrderBy(allPawns =>
+                    allPawns.skills?.AverageOfRelevantSkillsFor(wt) ?? 0f)
+                    .Reverse()
+                    .Take((int)(math.ceil(allPawns.Count * (p.BottomNPercent / 100f))))
+                    .ToList();
+
+                if (!topNPawns.Contains(pawn))
                     return false;
             }
 

@@ -34,6 +34,11 @@ namespace Better_Work_Tab.Features.Rules.Validators
                 return false;
             }
 
+            if (p.DevelopmentalStage != null && pawn.DevelopmentalStage != p.DevelopmentalStage)
+            {
+                return false;
+            }
+
             // Trait requirement (def + degree)
             if (p.RequiredTrait != null)
             {

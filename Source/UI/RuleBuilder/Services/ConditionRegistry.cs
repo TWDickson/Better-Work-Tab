@@ -72,6 +72,7 @@ namespace Better_Work_Tab.UI.RuleBuilder.Services
                     "IsNaturalAlwaysAssign" => p.IsNaturalAlwaysAssign,
                     "RequiredTrait" => p.RequiredTrait != null,
                     "Gender" => p.Gender != null,
+                    "DevelopmentalStage" => p.DevelopmentalStage != null,
                     "Xenotype" => p.Xenotype != null,
                     "IsCapableOfViolence" => p.IsCapableOfViolence,
                     "HasChildOnMap" => p.HasChildOnMap,
@@ -105,6 +106,7 @@ namespace Better_Work_Tab.UI.RuleBuilder.Services
                 "IsNaturalAlwaysAssign" => p.IsNaturalAlwaysAssign,
                 "RequiredTrait" => p.RequiredTrait,
                 "Gender" => p.Gender,
+                "DevelopmentalStage" => p.DevelopmentalStage,
                 "Xenotype" => p.Xenotype,
                 "IsCapableOfViolence" => p.IsCapableOfViolence,
                 "HasChildOnMap" => p.HasChildOnMap,
@@ -157,6 +159,9 @@ namespace Better_Work_Tab.UI.RuleBuilder.Services
                 case "Xenotype":
                     p.Xenotype = value as XenotypeDef;
                     p.XenotypeString = p.Xenotype?.defName ?? "";
+                    break;
+                case "DevelopmentalStage":
+                    p.DevelopmentalStage = value as DevelopmentalStage?;
                     break;
                 case "IsCapableOfViolence":
                     p.IsCapableOfViolence = (bool)value;
@@ -408,24 +413,37 @@ namespace Better_Work_Tab.UI.RuleBuilder.Services
                 },
                 new ConditionDefinition
                 {
-                    Key = "IsPregnant",
-                    Type = ConditionType.Bool,
+                    IncludeIfModActive = ModsConfig.BiotechActive,
+                    Key = "DevelopmentalStage",
+                    Type = ConditionType.DevelopmentalStage,
                     Category = "BWT_Category_Biological",
-                    DefaultValue = true,
-                    ShortLabel = "Pregnant"
+                    DefaultValue = DevelopmentalStage.Child,
+                    ShortLabel = "DevStage"
                 },
                 new ConditionDefinition
                 {
+                    IncludeIfModActive = ModsConfig.BiotechActive,
                     Key = "Xenotype",
                     Type = ConditionType.Xenotype,
                     Category = "BWT_Category_Biological",
                     DefaultValue = null,
                     ShortLabel = "Xeno"
                 },
-
+                new ConditionDefinition
+                {
+                    IncludeIfModActive = ModsConfig.BiotechActive,
+                    Key = "IsPregnant",
+                    Type = ConditionType.Bool,
+                    Category = "BWT_Category_Biological",
+                    DefaultValue = true,
+                    ShortLabel = "Pregnant"
+                },
+               
+                
                 // Social category
                 new ConditionDefinition
                 {
+                    IncludeIfModActive = ModsConfig.BiotechActive,
                     Key = "HasChildOnMap",
                     Type = ConditionType.Bool,
                     Category = "BWT_Category_Social",
@@ -548,6 +566,7 @@ namespace Better_Work_Tab.UI.RuleBuilder.Services
     /// </summary>
     public class ConditionDefinition
     {
+        public bool IncludeIfModActive { get; set; } = true;
         public string Key { get; set; }
         public ConditionType Type { get; set; }
         public string Category { get; set; }
