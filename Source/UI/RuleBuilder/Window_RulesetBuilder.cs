@@ -174,6 +174,7 @@ namespace Better_Work_Tab.UI.RuleBuilder
             }
 
             DrawPreviewToggleButton(previewButtonRect);
+
             if (RWWidgets.ButtonText(newButtonRect, newLabel))
                 CreateNewRuleset();
 
