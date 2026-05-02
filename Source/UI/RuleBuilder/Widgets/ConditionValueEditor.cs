@@ -38,6 +38,9 @@ namespace Better_Work_Tab.UI.RuleBuilder.Widgets
                 ConditionType.Gender => DrawGenderEditor(rect, condition, parameters, state),
                 ConditionType.Trait => DrawTraitEditor(rect, condition, parameters, state),
                 ConditionType.Xenotype => DrawXenotypeEditor(rect, condition, parameters, state),
+                ConditionType.DevelopmentalStage => DrawDevelopmentalStageEditor(rect, condition, parameters, state),
+                ConditionType.IdeoRole => DrawIdeoRoleEditor(rect, condition, parameters, state),
+                ConditionType.ColonyGroup => DrawColonyGroupEditor(rect, condition, parameters, state),
                 _ => false
             };
         }
@@ -402,6 +405,173 @@ namespace Better_Work_Tab.UI.RuleBuilder.Widgets
             RuleBuilderState state)
         {
             // IntRange not currently used; stub for future expansion
+            return false;
+        }
+
+        private static bool DrawDevelopmentalStageEditor(
+            Rect rect,
+            ConditionInfo condition,
+            WorkAssignmentParameters parameters,
+            RuleBuilderState state)
+        {
+            var current = (DevelopmentalStage)ConditionRegistry.GetValue(condition.Key, parameters);
+            string stageKey = current == DevelopmentalStage.None ? "BWT_Any" : $"BWT_Stage_{current}";
+            string label = stageKey.CanTranslate() ? stageKey.Translate() : current.ToString();
+
+            float buttonWidth = Mathf.Min(130f, rect.width);
+            float buttonHeight = Mathf.Max(18f, FieldHeight - 6f);
+            Rect buttonRect = new Rect(rect.x, rect.y + (rect.height - buttonHeight) / 2f, buttonWidth, buttonHeight);
+
+            if (Verse.Widgets.ButtonText(buttonRect, label))
+            {
+                var options = new List<FloatMenuOption>
+                {
+                    new FloatMenuOption("BWT_Any".Translate(), () =>
+                    {
+                        ConditionRegistry.SetValue(condition.Key, parameters, DevelopmentalStage.None);
+                        state.NotifyRulesModified();
+                        SoundDefOf.Tick_Tiny.PlayOneShotOnCamera();
+                    })
+                };
+
+                var stages = new[]
+                {
+                    DevelopmentalStage.Newborn,
+                    DevelopmentalStage.Baby,
+                    DevelopmentalStage.Child,
+                    DevelopmentalStage.Adult,
+                };
+
+                foreach (var stage in stages)
+                {
+                    var localStage = stage;
+                    string sk = $"BWT_Stage_{stage}";
+                    string sl = sk.CanTranslate() ? sk.Translate() : stage.ToString();
+                    options.Add(new FloatMenuOption(sl, () =>
+                    {
+                        ConditionRegistry.SetValue(condition.Key, parameters, localStage);
+                        state.NotifyRulesModified();
+                        SoundDefOf.Tick_Tiny.PlayOneShotOnCamera();
+                    }));
+                }
+
+                Find.WindowStack.Add(new FloatMenu(options));
+                return true;
+            }
+
+            return false;
+        }
+
+        private static bool DrawIdeoRoleEditor(
+            Rect rect,
+            ConditionInfo condition,
+            WorkAssignmentParameters parameters,
+            RuleBuilderState state)
+        {
+            if (!ModsConfig.IdeologyActive)
+            {
+                GUI.color = RuleBuilderConstants.DisabledColor;
+                string ideoMsg = "BWT_IdeologyRequired".CanTranslate()
+                    ? "BWT_IdeologyRequired".Translate()
+                    : "Requires Ideology DLC";
+                Verse.Widgets.Label(rect, ideoMsg);
+                GUI.color = Color.white;
+                return false;
+            }
+
+            var currentValue = ConditionRegistry.GetValue(condition.Key, parameters) as PreceptDef;
+            string label = currentValue?.LabelCap ?? "BWT_None".Translate();
+
+            float buttonWidth = Mathf.Min(150f, rect.width);
+            float buttonHeight = Mathf.Max(18f, FieldHeight - 6f);
+            Rect buttonRect = new Rect(rect.x, rect.y + (rect.height - buttonHeight) / 2f, buttonWidth, buttonHeight);
+
+            if (Verse.Widgets.ButtonText(buttonRect, label))
+            {
+                var rolePrecepts = DefDatabase<PreceptDef>.AllDefs
+                    .Where(d => d.preceptClass != null && typeof(Precept_Role).IsAssignableFrom(d.preceptClass))
+                    .OrderBy(d => d.LabelCap)
+                    .ToList();
+
+                var options = new List<FloatMenuOption>
+                {
+                    new FloatMenuOption("BWT_None".Translate(), () =>
+                    {
+                        ConditionRegistry.SetValue(condition.Key, parameters, null);
+                        state.NotifyRulesModified();
+                        SoundDefOf.Tick_Tiny.PlayOneShotOnCamera();
+                    })
+                };
+
+                foreach (var precept in rolePrecepts)
+                {
+                    var localPrecept = precept;
+                    options.Add(new FloatMenuOption(precept.LabelCap, () =>
+                    {
+                        ConditionRegistry.SetValue(condition.Key, parameters, localPrecept);
+                        state.NotifyRulesModified();
+                        SoundDefOf.Tick_Tiny.PlayOneShotOnCamera();
+                    }));
+                }
+
+                Find.WindowStack.Add(new FloatMenu(options));
+                return true;
+            }
+
+            return false;
+        }
+
+        private static bool DrawColonyGroupEditor(
+            Rect rect,
+            ConditionInfo condition,
+            WorkAssignmentParameters parameters,
+            RuleBuilderState state)
+        {
+            var currentValue = ConditionRegistry.GetValue(condition.Key, parameters) as string;
+            string label = string.IsNullOrEmpty(currentValue)
+                ? ("BWT_Any".CanTranslate() ? "BWT_Any".Translate() : "Any")
+                : currentValue;
+
+            float buttonWidth = Mathf.Min(150f, rect.width);
+            float buttonHeight = Mathf.Max(18f, FieldHeight - 6f);
+            Rect buttonRect = new Rect(rect.x, rect.y + (rect.height - buttonHeight) / 2f, buttonWidth, buttonHeight);
+
+            if (Verse.Widgets.ButtonText(buttonRect, label))
+            {
+                var groupNames = Better_Work_Tab.ModSupport.ModSupportManager.GetColonyGroupNames();
+
+                var options = new List<FloatMenuOption>
+                {
+                    new FloatMenuOption("BWT_Any".CanTranslate() ? "BWT_Any".Translate() : "Any", () =>
+                    {
+                        ConditionRegistry.SetValue(condition.Key, parameters, null);
+                        state.NotifyRulesModified();
+                        SoundDefOf.Tick_Tiny.PlayOneShotOnCamera();
+                    })
+                };
+
+                if (groupNames.Count == 0)
+                {
+                    options.Add(new FloatMenuOption("[LTO Colony Groups not active or no groups defined]", null));
+                }
+                else
+                {
+                    foreach (var name in groupNames)
+                    {
+                        var localName = name;
+                        options.Add(new FloatMenuOption(name, () =>
+                        {
+                            ConditionRegistry.SetValue(condition.Key, parameters, localName);
+                            state.NotifyRulesModified();
+                            SoundDefOf.Tick_Tiny.PlayOneShotOnCamera();
+                        }));
+                    }
+                }
+
+                Find.WindowStack.Add(new FloatMenu(options));
+                return true;
+            }
+
             return false;
         }
     }

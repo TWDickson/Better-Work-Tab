@@ -83,6 +83,11 @@ namespace Better_Work_Tab.UI.RuleBuilder.Services
                     "IsNthBestPawn" => p.IsNthBestPawn > 0,
                     "IsNthBestSkill" => p.IsNthBestSkill > 0,
                     "LimitNumberOfWorktypes" => p.LimitNumberOfWorktypes > 0,
+                    "AgeGreaterThan" => p.AgeGreaterThan >= 0,
+                    "AgeLessThan" => p.AgeLessThan >= 0,
+                    "RequiredDevelopmentalStage" => p.RequiredDevelopmentalStage != DevelopmentalStage.None,
+                    "RequiredIdeoRole" => p.RequiredIdeoRole != null,
+                    "ColonyGroupName" => p.ColonyGroupName != null,
                     _ => false
                 };
             }
@@ -116,6 +121,11 @@ namespace Better_Work_Tab.UI.RuleBuilder.Services
                 "IsNthBestPawn" => p.IsNthBestPawn,
                 "IsNthBestSkill" => p.IsNthBestSkill,
                 "LimitNumberOfWorktypes" => p.LimitNumberOfWorktypes,
+                "AgeGreaterThan" => p.AgeGreaterThan,
+                "AgeLessThan" => p.AgeLessThan,
+                "RequiredDevelopmentalStage" => p.RequiredDevelopmentalStage,
+                "RequiredIdeoRole" => p.RequiredIdeoRole,
+                "ColonyGroupName" => p.ColonyGroupName,
                 _ => null
             };
         }
@@ -188,6 +198,22 @@ namespace Better_Work_Tab.UI.RuleBuilder.Services
                 case "LimitNumberOfWorktypes":
                     p.LimitNumberOfWorktypes = (int)value;
                     break;
+                case "AgeGreaterThan":
+                    p.AgeGreaterThan = (int)value;
+                    break;
+                case "AgeLessThan":
+                    p.AgeLessThan = (int)value;
+                    break;
+                case "RequiredDevelopmentalStage":
+                    p.RequiredDevelopmentalStage = (DevelopmentalStage)value;
+                    break;
+                case "RequiredIdeoRole":
+                    p.RequiredIdeoRole = value as PreceptDef;
+                    p.RequiredIdeoRoleString = p.RequiredIdeoRole?.defName ?? "";
+                    break;
+                case "ColonyGroupName":
+                    p.ColonyGroupName = value as string;
+                    break;
             }
         }
 
@@ -258,6 +284,22 @@ namespace Better_Work_Tab.UI.RuleBuilder.Services
                 case "LimitNumberOfWorktypes":
                     p.LimitNumberOfWorktypes = 0;
                     break;
+                case "AgeGreaterThan":
+                    p.AgeGreaterThan = -1;
+                    break;
+                case "AgeLessThan":
+                    p.AgeLessThan = -1;
+                    break;
+                case "RequiredDevelopmentalStage":
+                    p.RequiredDevelopmentalStage = DevelopmentalStage.None;
+                    break;
+                case "RequiredIdeoRole":
+                    p.RequiredIdeoRole = null;
+                    p.RequiredIdeoRoleString = "";
+                    break;
+                case "ColonyGroupName":
+                    p.ColonyGroupName = null;
+                    break;
             }
 
             if (p.ActiveConditions != null)
@@ -303,6 +345,13 @@ namespace Better_Work_Tab.UI.RuleBuilder.Services
             {
                 p.ActiveConditions.Add(key);
             }
+        }
+
+        private static PreceptDef GetDefaultIdeoRole()
+        {
+            return DefDatabase<PreceptDef>.AllDefs
+                .FirstOrDefault(d => d.preceptClass != null &&
+                                     typeof(Precept_Role).IsAssignableFrom(d.preceptClass));
         }
 
         private static Tuple<TraitDef, int> GetDefaultTrait()
@@ -422,6 +471,34 @@ namespace Better_Work_Tab.UI.RuleBuilder.Services
                     DefaultValue = null,
                     ShortLabel = "Xeno"
                 },
+                new ConditionDefinition
+                {
+                    Key = "AgeGreaterThan",
+                    Type = ConditionType.Int,
+                    Category = "BWT_Category_Biological",
+                    MinValue = 0,
+                    MaxValue = 120,
+                    DefaultValue = 18,
+                    ShortLabel = "Age >"
+                },
+                new ConditionDefinition
+                {
+                    Key = "AgeLessThan",
+                    Type = ConditionType.Int,
+                    Category = "BWT_Category_Biological",
+                    MinValue = 1,
+                    MaxValue = 120,
+                    DefaultValue = 13,
+                    ShortLabel = "Age <"
+                },
+                new ConditionDefinition
+                {
+                    Key = "RequiredDevelopmentalStage",
+                    Type = ConditionType.DevelopmentalStage,
+                    Category = "BWT_Category_Biological",
+                    DefaultValue = DevelopmentalStage.Adult,
+                    ShortLabel = "Dev. Stage"
+                },
 
                 // Social category
                 new ConditionDefinition
@@ -439,6 +516,22 @@ namespace Better_Work_Tab.UI.RuleBuilder.Services
                     Category = "BWT_Category_Social",
                     DefaultValue = GetDefaultTrait(),
                     ShortLabel = "Trait"
+                },
+                new ConditionDefinition
+                {
+                    Key = "RequiredIdeoRole",
+                    Type = ConditionType.IdeoRole,
+                    Category = "BWT_Category_Social",
+                    DefaultValue = GetDefaultIdeoRole(),
+                    ShortLabel = "Ideo Role"
+                },
+                new ConditionDefinition
+                {
+                    Key = "ColonyGroupName",
+                    Type = ConditionType.ColonyGroup,
+                    Category = "BWT_Category_Social",
+                    DefaultValue = null,
+                    ShortLabel = "Group"
                 },
 
                 // Capability category

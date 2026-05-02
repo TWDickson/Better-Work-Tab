@@ -66,6 +66,28 @@ namespace Better_Work_Tab.UI.RuleBuilder.Services
             if (p.Xenotype != null)
                 parts.Add(p.Xenotype.LabelCap);
 
+            // Age
+            if (p.AgeGreaterThan >= 0)
+                parts.Add($"Age>{p.AgeGreaterThan}");
+
+            if (p.AgeLessThan >= 0)
+                parts.Add($"Age<{p.AgeLessThan}");
+
+            // Developmental stage
+            if (p.RequiredDevelopmentalStage != DevelopmentalStage.None)
+            {
+                string sk = $"BWT_Stage_{p.RequiredDevelopmentalStage}";
+                parts.Add(sk.CanTranslate() ? sk.Translate() : p.RequiredDevelopmentalStage.ToString());
+            }
+
+            // Ideology role
+            if (p.RequiredIdeoRole != null)
+                parts.Add(p.RequiredIdeoRole.LabelCap);
+
+            // Colony group
+            if (!string.IsNullOrEmpty(p.ColonyGroupName))
+                parts.Add($"[{p.ColonyGroupName}]");
+
             // Assignment behavior
             if (p.IsNaturalAlwaysAssign)
                 parts.Add("BWT_CondName_AlwaysAssign".Translate());

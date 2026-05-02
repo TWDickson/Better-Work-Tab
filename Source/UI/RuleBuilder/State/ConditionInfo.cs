@@ -16,7 +16,10 @@ namespace Better_Work_Tab.UI.RuleBuilder.State
         Passion,
         Gender,
         Trait,
-        Xenotype
+        Xenotype,
+        DevelopmentalStage,
+        IdeoRole,
+        ColonyGroup
     }
 
     /// <summary>
@@ -102,6 +105,21 @@ namespace Better_Work_Tab.UI.RuleBuilder.State
                 case ConditionType.Xenotype:
                     var xeno = Value as XenotypeDef;
                     return xeno?.LabelCap ?? "None";
+
+                case ConditionType.DevelopmentalStage:
+                    var devStage = (DevelopmentalStage)Value;
+                    if (devStage == DevelopmentalStage.None)
+                        return "Any";
+                    string stageKey = $"BWT_Stage_{devStage}";
+                    return stageKey.CanTranslate() ? stageKey.Translate() : devStage.ToString();
+
+                case ConditionType.IdeoRole:
+                    var roleDef = Value as PreceptDef;
+                    return roleDef?.LabelCap ?? "None";
+
+                case ConditionType.ColonyGroup:
+                    var groupName = Value as string;
+                    return string.IsNullOrEmpty(groupName) ? "Any" : groupName;
 
                 default:
                     return Value?.ToString() ?? "-";

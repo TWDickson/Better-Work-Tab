@@ -87,9 +87,34 @@ namespace Better_Work_Tab.Features.Rules
 
         [RuleParameter]
         public float MoveSpeedGreaterThan = -1;
-        
+
         [RuleParameter]
         public float MoveSpeedLessThan = -1;
+
+        [RuleParameter]
+        public int AgeGreaterThan = -1;
+
+        [RuleParameter]
+        public int AgeLessThan = -1;
+
+        /// <summary>
+        /// Developmental stage the pawn must be in.
+        /// Note: Toddlers mod maps toddlers to DevelopmentalStage.Baby (same as infants).
+        /// Use Age conditions to target toddlers specifically.
+        /// DevelopmentalStage.None means inactive (no filter).
+        /// </summary>
+        [RuleParameter]
+        public DevelopmentalStage RequiredDevelopmentalStage = DevelopmentalStage.None;
+
+        [RuleParameter]
+        public PreceptDef RequiredIdeoRole;
+
+        /// <summary>Serialization backing field for RequiredIdeoRole.</summary>
+        public string RequiredIdeoRoleString = "";
+
+        /// <summary>LTO Colony Groups group name the pawn must belong to.</summary>
+        [RuleParameter]
+        public string ColonyGroupName = null;
 
         /// <summary>
         /// Serialization fallback when <see cref="Worktype"/> cannot be resolved.
@@ -240,6 +265,12 @@ namespace Better_Work_Tab.Features.Rules
                 HasChildOnMap = HasChildOnMap,
                 MoveSpeedGreaterThan = MoveSpeedGreaterThan,
                 MoveSpeedLessThan = MoveSpeedLessThan,
+                AgeGreaterThan = AgeGreaterThan,
+                AgeLessThan = AgeLessThan,
+                RequiredDevelopmentalStage = RequiredDevelopmentalStage,
+                RequiredIdeoRole = RequiredIdeoRole,
+                RequiredIdeoRoleString = RequiredIdeoRoleString,
+                ColonyGroupName = ColonyGroupName,
                 WorktypeString = WorktypeString,
                 XenotypeString = XenotypeString,
                 TraitString = TraitString,
@@ -282,6 +313,11 @@ namespace Better_Work_Tab.Features.Rules
             Scribe_Values.Look(ref IgnoreIfWorktypeNonexistent, "IgnoreIfWorktypeNonexistent");
             Scribe_Values.Look(ref MoveSpeedGreaterThan, "MoveSpeedGreaterThan", -1f);
             Scribe_Values.Look(ref MoveSpeedLessThan, "MoveSpeedLessThan", -1f);
+            Scribe_Values.Look(ref AgeGreaterThan, "AgeGreaterThan", -1);
+            Scribe_Values.Look(ref AgeLessThan, "AgeLessThan", -1);
+            Scribe_Values.Look(ref RequiredDevelopmentalStage, "RequiredDevelopmentalStage", DevelopmentalStage.None);
+            Scribe_Values.Look(ref RequiredIdeoRoleString, "RequiredIdeoRoleString");
+            Scribe_Values.Look(ref ColonyGroupName, "ColonyGroupName");
             Scribe_Collections.Look(ref ActiveConditions, "ActiveConditions", LookMode.Value);
 
 
@@ -294,7 +330,8 @@ namespace Better_Work_Tab.Features.Rules
 
                 ResolveWorktypeFromString();
                 ResolveXenotypeFromString();
-                ResolveTraitRequirement(null, -1);  // Resolve from strings only
+                ResolveTraitRequirement(null, -1);
+                ResolveIdeoRoleFromString();
                 ValidateActiveConditions();
             }
         }
@@ -305,6 +342,7 @@ namespace Better_Work_Tab.Features.Rules
             XenotypeString = Xenotype?.defName ?? XenotypeString ?? "";
             TraitString = RequiredTrait?.Item1?.defName ?? TraitString ?? "";
             TraitDegree = RequiredTrait?.Item2 ?? TraitDegree;
+            RequiredIdeoRoleString = RequiredIdeoRole?.defName ?? RequiredIdeoRoleString ?? "";
         }
 
         /// <summary>
@@ -327,6 +365,14 @@ namespace Better_Work_Tab.Features.Rules
             {
                 ActiveConditions.Remove(orphan);
                 Log.Warning($"[BWT] Rule \"{RuleName}\" references unknown condition \"{orphan}\"; removing.");
+            }
+        }
+
+        private void ResolveIdeoRoleFromString()
+        {
+            if (RequiredIdeoRole == null && !string.IsNullOrEmpty(RequiredIdeoRoleString))
+            {
+                RequiredIdeoRole = DefDatabase<PreceptDef>.GetNamedSilentFail(RequiredIdeoRoleString);
             }
         }
 

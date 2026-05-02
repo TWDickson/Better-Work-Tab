@@ -41,10 +41,22 @@ namespace Better_Work_Tab.Features.Rules.Validators
                 var degree = p.RequiredTrait.Item2;
                 bool hasTrait = pawn.story?.traits.HasTrait(traitDef, degree) ?? false;
 
-               
                 if (!hasTrait)
                     return false;
             }
+
+            // Age requirements — uses biological age (whole years)
+            if (p.AgeGreaterThan >= 0 && pawn.ageTracker.AgeBiologicalYears <= p.AgeGreaterThan)
+                return false;
+
+            if (p.AgeLessThan >= 0 && pawn.ageTracker.AgeBiologicalYears >= p.AgeLessThan)
+                return false;
+
+            // Developmental stage filter — matches RimWorld's own enum (Newborn/Baby/Child/Adult).
+            // With Toddlers mod, toddlers share DevelopmentalStage.Baby with infants.
+            if (p.RequiredDevelopmentalStage != DevelopmentalStage.None &&
+                pawn.DevelopmentalStage != p.RequiredDevelopmentalStage)
+                return false;
 
             return true;
         }
