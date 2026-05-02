@@ -15,7 +15,7 @@ namespace Better_Work_Tab.ModSupport
         private static readonly List<IModSupportModule> _allModules = new List<IModSupportModule>
         {
             new UsefulMarksSupport(),
-            // Add instances of other support modules here: new SomeOtherModSupport(),
+            new LTOColonyGroupsSupport(),
         };
 
         static ModSupportManager()
@@ -66,6 +66,26 @@ namespace Better_Work_Tab.ModSupport
             {
                 _activeModules[i].OnRulesEvaluated(pawn, currentParameters);
             }
+        }
+
+        public static bool IsInColonyGroup(Pawn pawn, string groupName)
+        {
+            foreach (var module in _activeModules)
+            {
+                if (module is LTOColonyGroupsSupport lto)
+                    return lto.IsInGroup(pawn, groupName);
+            }
+            return false;
+        }
+
+        public static List<string> GetColonyGroupNames()
+        {
+            foreach (var module in _activeModules)
+            {
+                if (module is LTOColonyGroupsSupport lto)
+                    return lto.GetGroupNames();
+            }
+            return new List<string>();
         }
 
         // Special helper for getting specific mod data (e.g., Useful Marks)
