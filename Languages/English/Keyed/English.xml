@@ -59,6 +59,31 @@
 <BWT_Gender_Desc>Only assign to pawns of this gender.</BWT_Gender_Desc>
 <BWT_Xenotype_Desc>Only assign to pawns with this Xenotype.</BWT_Xenotype_Desc>
 <BWT_RequiredTrait_Desc>Only assign to pawns with this trait.</BWT_RequiredTrait_Desc>
+
+  <!-- Age conditions -->
+  <BWT_AgeGreaterThan>Age older than</BWT_AgeGreaterThan>
+  <BWT_AgeGreaterThan_Desc>Only assign to pawns whose biological age is strictly greater than this value (in years).</BWT_AgeGreaterThan_Desc>
+  <BWT_AgeLessThan>Age younger than</BWT_AgeLessThan>
+  <BWT_AgeLessThan_Desc>Only assign to pawns whose biological age is strictly less than this value (in years).</BWT_AgeLessThan_Desc>
+
+  <!-- Developmental stage condition -->
+  <BWT_RequiredDevelopmentalStage>Life stage</BWT_RequiredDevelopmentalStage>
+  <BWT_RequiredDevelopmentalStage_Desc>Only assign to pawns at this developmental stage. Note: with the Toddlers mod installed, toddlers appear as "Baby" here — use age conditions to target them specifically.</BWT_RequiredDevelopmentalStage_Desc>
+
+  <!-- Developmental stage option labels -->
+  <BWT_Stage_Newborn>Newborn</BWT_Stage_Newborn>
+  <BWT_Stage_Baby>Baby (incl. Toddlers mod)</BWT_Stage_Baby>
+  <BWT_Stage_Child>Child</BWT_Stage_Child>
+  <BWT_Stage_Adult>Adult</BWT_Stage_Adult>
+
+  <!-- Ideology role condition -->
+  <BWT_RequiredIdeoRole>Ideology role</BWT_RequiredIdeoRole>
+  <BWT_RequiredIdeoRole_Desc>Only assign to pawns who hold the selected role in their ideology. Requires the Ideology DLC.</BWT_RequiredIdeoRole_Desc>
+  <BWT_IdeologyRequired>Requires Ideology DLC</BWT_IdeologyRequired>
+
+  <!-- LTO Colony Groups condition -->
+  <BWT_ColonyGroupName>Colony group</BWT_ColonyGroupName>
+  <BWT_ColonyGroupName_Desc>Only assign to pawns who belong to the named group in [LTO] Colony Groups. The group picker shows groups from the current game session.</BWT_ColonyGroupName_Desc>
 <BWT_AssignSimilarWorktypes_Desc>I don't want to do the menu for this one. But if/when I do it'll be like 'Assign this rule to worktypes that have the same relevant skill(s) as this work type.'</BWT_AssignSimilarWorktypes_Desc>
 <BWT_FailedToApplyFallback_Desc>I don't want to do the menu for this one either. But if/when I do the tooltip will be like 'Assign this rule instead if the main rule didn't assign any pawns.'</BWT_FailedToApplyFallback_Desc>
 
