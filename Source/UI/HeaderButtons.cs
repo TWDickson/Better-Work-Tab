@@ -19,6 +19,7 @@ namespace Better_Work_Tab.UI
         private const float AutoAssignButtonHeight = 28f;
         private const float WorkloadButtonWidth = 150f;
         private const float WorkloadButtonHeight = 28f;
+        private const float EditRulesButtonWidth = 90f;
         private const float InterControlGap = 6f;
 
         // Public entry point called by the window.
@@ -32,7 +33,10 @@ namespace Better_Work_Tab.UI
             // Auto-assign group (closest to gear)
             xRight = DrawAutoAssignGroup(inRect, xRight, y);
 
-            // Workload group to the left of the Auto-assign group
+            // Rule Editor button to the left of the auto-assign group
+            xRight = DrawEditRulesButton(xRight, y);
+
+            // Workload group to the left of everything
             xRight = DrawWorkloadGroup(xRight, y);
         }
 
@@ -91,18 +95,61 @@ namespace Better_Work_Tab.UI
                     var local = ruleset;
                     options.Add(new FloatMenuOption(local.Name, () =>
                     {
-                        // Rulesets are now local-only (not synced in multiplayer)
                         BetterWorkTabMod.Settings.CurrentRuleset = local;
                         SoundDefOf.Tick_Low.PlayOneShotOnCamera();
                     }));
                 }
 
-                AddRulesetManagementOptions(options);
-
                 Find.WindowStack.Add(new FloatMenu(options));
             }
 
             return newRight;
+        }
+
+        private static float DrawEditRulesButton(float xRight, float y)
+        {
+            var settings = BetterWorkTabMod.Settings;
+            if (!(settings?.enableAutoAssignFeature ?? true))
+                return xRight;
+
+            var btnRect = new Rect(xRight - EditRulesButtonWidth, y, EditRulesButtonWidth, AutoAssignButtonHeight);
+
+            if (Widgets.ButtonText(btnRect, "BWT_OpenRuleEditor".Translate()))
+            {
+                var mode = settings.rulesetViewMode;
+
+                if (mode == BetterWorkTabSettings.RulesetViewMode.Both)
+                {
+                    var options = new List<FloatMenuOption>
+                    {
+                        new FloatMenuOption("BWT_RuleBuilder_OpenBuilder".Translate(), () =>
+                        {
+                            Find.WindowStack.Add(new Window_RulesetBuilder());
+                            SoundDefOf.Tick_Low.PlayOneShotOnCamera();
+                        }),
+                        new FloatMenuOption("BWT_RuleBuilder_ManageRulesets".Translate(), () =>
+                        {
+                            Find.WindowStack.Add(new Window_RulesManager());
+                            SoundDefOf.Tick_Low.PlayOneShotOnCamera();
+                        })
+                    };
+                    Find.WindowStack.Add(new FloatMenu(options));
+                }
+                else if (mode == BetterWorkTabSettings.RulesetViewMode.Raw)
+                {
+                    Find.WindowStack.Add(new Window_RulesManager());
+                    SoundDefOf.Tick_Low.PlayOneShotOnCamera();
+                }
+                else
+                {
+                    Find.WindowStack.Add(new Window_RulesetBuilder());
+                    SoundDefOf.Tick_Low.PlayOneShotOnCamera();
+                }
+            }
+
+            TooltipHandler.TipRegion(btnRect, "BWT_RuleBuilder_OpenBuilder".Translate());
+
+            return btnRect.x - InterControlGap;
         }
 
         private static float DrawWorkloadGroup(float xRight, float y)
@@ -186,44 +233,31 @@ namespace Better_Work_Tab.UI
 
             if (workloads.Any())
             {
-                options.Add(new FloatMenuOption("Rename Workload", () =>
+                options.Add(new FloatMenuOption("— Rename —", null));
+                foreach (var wl in workloads)
                 {
-                    var ren = new List<FloatMenuOption>();
-                    // This loop now uses the correct, non-reversed list.
-                    foreach (var wl in workloads)
+                    var local = wl;
+                    options.Add(new FloatMenuOption("Rename " + local.RenamableLabel, () =>
                     {
-                        var local = wl;
-                        ren.Add(new FloatMenuOption("Rename " + local.RenamableLabel,
-                            () =>
-                            {
-                                Find.WindowStack.Add(new Dialog_RenameWorkload(local));
-                                SoundDefOf.Tick_Low.PlayOneShotOnCamera();
-                            }));
-                    }
-                    Find.WindowStack.Add(new FloatMenu(ren));
-                }));
+                        Find.WindowStack.Add(new Dialog_RenameWorkload(local));
+                        SoundDefOf.Tick_Low.PlayOneShotOnCamera();
+                    }));
+                }
 
-                options.Add(new FloatMenuOption("Delete Saved Workload", () =>
+                options.Add(new FloatMenuOption("— Delete —", null));
+                foreach (var wl in workloads)
                 {
-                    var del = new List<FloatMenuOption>();
-                    // This loop also now uses the correct, non-reversed list.
-                    foreach (var wl in workloads)
+                    var local = wl;
+                    options.Add(new FloatMenuOption("Delete " + local.RenamableLabel, () =>
                     {
-                        var local = wl;
-                        del.Add(new FloatMenuOption("Delete " + local.RenamableLabel,
-                            () =>
-                            {
-                                workloadSaver.SavedWorklists.Remove(local);
-                                if (workloadSaver.CurrentWorklist == local)
-                                    workloadSaver.CurrentWorklist = null;
+                        workloadSaver.SavedWorklists.Remove(local);
+                        if (workloadSaver.CurrentWorklist == local)
+                            workloadSaver.CurrentWorklist = null;
 
-                                MainTabWindowUtility.NotifyAllPawnTables_PawnsChanged();
-
-                                SoundDefOf.Tick_Low.PlayOneShotOnCamera();
-                            }));
-                    }
-                    Find.WindowStack.Add(new FloatMenu(del));
-                }));
+                        MainTabWindowUtility.NotifyAllPawnTables_PawnsChanged();
+                        SoundDefOf.Tick_Low.PlayOneShotOnCamera();
+                    }));
+                }
             }
 
             Find.WindowStack.Add(new FloatMenu(options));
@@ -249,40 +283,6 @@ namespace Better_Work_Tab.UI
             MainTabWindowUtility.NotifyAllPawnTables_PawnsChanged();
         }
 
-
-        /// <summary>
-        /// Adds the standard ruleset management options to the provided menu.
-        /// Keeps labels and behaviors consistent across entry points.
-        /// </summary>
-        private static void AddRulesetManagementOptions(List<FloatMenuOption> options)
-        {
-            var mode = BetterWorkTabMod.Settings.rulesetViewMode;
-
-            // Regular (Visual Builder)
-            if (mode == BetterWorkTabSettings.RulesetViewMode.Regular || mode == BetterWorkTabSettings.RulesetViewMode.Both)
-            {
-                options.Add(new FloatMenuOption("BWT_RuleBuilder_OpenBuilder".Translate(), () =>
-                {
-                    Find.WindowStack.Add(new Window_RulesetBuilder());
-                    SoundDefOf.Tick_Low.PlayOneShotOnCamera();
-                }));
-            }
-
-            // Raw (Classic/Manager)
-            if (mode == BetterWorkTabSettings.RulesetViewMode.Raw || mode == BetterWorkTabSettings.RulesetViewMode.Both)
-            {
-                // In Both mode, we differentiate with "(Raw)".
-                string label = mode == BetterWorkTabSettings.RulesetViewMode.Raw 
-                    ? "BWT_RuleBuilder_ManageRulesets".Translate() 
-                    : "BWT_RuleBuilder_ManageRulesets".Translate() + " (Raw)";
-
-                options.Add(new FloatMenuOption(label, () =>
-                {
-                    Find.WindowStack.Add(new Window_RulesManager());
-                    SoundDefOf.Tick_Low.PlayOneShotOnCamera();
-                }));
-            }
-        }
 
         private static void ConfirmApplyWithResetWarning(string title, System.Action onConfirm, System.Action<bool> setDoNotShowAgain)
         {
