@@ -655,7 +655,17 @@ namespace Better_Work_Tab
 
             if (hiddenWorktypes == null) hiddenWorktypes = new List<string>();
 
-            Scribe_Collections.Look(ref SavedRulesets, "SavedRulesets", LookMode.Deep);
+            if (Scribe.mode == LoadSaveMode.Saving)
+            {
+                // Only persist global and default rulesets in mod settings; local (per-save) rulesets
+                // are written by GameComponent_BWTWorldSettings into the save file instead.
+                var globalRulesets = SavedRulesets?.Where(r => r.IsGlobal || r.IsDefault).ToList();
+                Scribe_Collections.Look(ref globalRulesets, "SavedRulesets", LookMode.Deep);
+            }
+            else
+            {
+                Scribe_Collections.Look(ref SavedRulesets, "SavedRulesets", LookMode.Deep);
+            }
 
             string currentRulesetName = CurrentRuleset?.Name;
             Scribe_Values.Look(ref currentRulesetName, "CurrentRulesetName", null, forceSave: true);

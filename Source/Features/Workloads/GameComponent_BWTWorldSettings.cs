@@ -1,4 +1,5 @@
 using Better_Work_Tab.Features;
+using Better_Work_Tab.Features.Rules;
 using Better_Work_Tab.Mod_Support.LocalProfiles;
 using Better_Work_Tab.Mod_Support.Multiplayer;
 using Better_Work_Tab.Patches;
@@ -19,6 +20,7 @@ namespace Better_Work_Tab.Features.Workloads
         public List<string> ColumnCurrentOrder = new List<string>();
         public List<string> ColumnBaselineOrder = new List<string>();
         public List<PawnDivider> ActiveDividers = new List<PawnDivider>();
+        public List<WorkAssignmentRuleset> LocalRulesets = new List<WorkAssignmentRuleset>();
 
         public GameComponent_BWTWorldSettings(Game game) : base()
         {
@@ -27,6 +29,15 @@ namespace Better_Work_Tab.Features.Workloads
         public override void FinalizeInit()
         {
             base.FinalizeInit();
+
+            // Replace any local rulesets left over from a previous session with this save's local rulesets.
+            var settings = BetterWorkTabMod.Settings;
+            if (settings?.SavedRulesets != null)
+            {
+                settings.SavedRulesets.RemoveAll(r => !r.IsGlobal && !r.IsDefault);
+                if (LocalRulesets != null)
+                    settings.SavedRulesets.AddRange(LocalRulesets);
+            }
 
             if (MultiplayerBridge.Active)
                 BWTLocalProfileStore.LoadOrCreateForCurrentSession();
@@ -68,6 +79,15 @@ namespace Better_Work_Tab.Features.Workloads
                 Scribe_Collections.Look(ref SavedWorklists, "SavedWorklists", LookMode.Deep, new object[0]);
                 Scribe_Deep.Look(ref CurrentWorklist, "CurrentWorklist");
                 Scribe_Collections.Look(ref ActiveDividers, "ActiveDividers", LookMode.Deep);
+
+                if (Scribe.mode == LoadSaveMode.Saving)
+                {
+                    // Collect local rulesets from the runtime settings list before writing
+                    LocalRulesets = BetterWorkTabMod.Settings?.SavedRulesets
+                        ?.Where(r => !r.IsGlobal && !r.IsDefault)
+                        .ToList() ?? new List<WorkAssignmentRuleset>();
+                }
+                Scribe_Collections.Look(ref LocalRulesets, "LocalRulesets", LookMode.Deep);
             }
             else
             {

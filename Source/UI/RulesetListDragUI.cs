@@ -295,16 +295,17 @@ namespace Better_Work_Tab.UI
                 var newSet = new WorkAssignmentRuleset(
                     "New Ruleset " + (_items.Count + 1),
                     new List<WorkAssignmentParameters>());
+                newSet.IsGlobal = false;
 
                 _items.Add(newSet);
                 SelectedRuleset = newSet;
                 _onSelect?.Invoke(newSet);
             }
 
-            if (SelectedRuleset != null &&
-                Widgets.ButtonText(topBtn.RightPart(0.48f), "Duplicate"))
+            if (Widgets.ButtonText(topBtn.RightPart(0.48f), "Duplicate") && SelectedRuleset != null)
             {
                 var copied = SelectedRuleset.Copy();
+                copied.IsGlobal = false;
                 _items.Add(copied);
                 SelectedRuleset = copied;
                 _onSelect?.Invoke(copied);
@@ -323,7 +324,8 @@ namespace Better_Work_Tab.UI
             else if (isBeingDragged)
                 GUI.color = new Color(0.4f, 1f, 0.4f);
 
-            string text = ruleset.Name + (ruleset.IsDefault ? " *" : "");
+            string badge = ruleset.IsDefault ? " *" : (!ruleset.IsGlobal ? " [L]" : "");
+            string text = ruleset.Name + badge;
 
             Text.Anchor = TextAnchor.MiddleLeft;
             Widgets.Label(labelRect, text);

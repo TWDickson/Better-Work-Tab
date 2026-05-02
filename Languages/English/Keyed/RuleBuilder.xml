@@ -6,6 +6,18 @@
   <BWT_RuleBuilder_OpenBuilder>Ruleset Builder...</BWT_RuleBuilder_OpenBuilder>
   <BWT_RuleBuilder_ManageRulesets>Manage Rulesets</BWT_RuleBuilder_ManageRulesets>
   <BWT_OpenRuleEditor>Rule Editor</BWT_OpenRuleEditor>
+  <BWT_DuplicateRuleset>Duplicate</BWT_DuplicateRuleset>
+  <BWT_GlobalRuleset>Global</BWT_GlobalRuleset>
+  <BWT_LocalRuleset>Save-Local</BWT_LocalRuleset>
+  <BWT_GlobalRuleset_Tooltip>This ruleset is saved globally and available in every save game.</BWT_GlobalRuleset_Tooltip>
+  <BWT_LocalRuleset_Tooltip>This ruleset is saved with this save game only. Toggle to make it available everywhere.</BWT_LocalRuleset_Tooltip>
+  <BWT_RuleDisabledMissingMod>Skipped — requires: {0}</BWT_RuleDisabledMissingMod>
+  <BWT_MissingModsWarning>Some rules will be skipped because required mods are not active:
+
+{0}
+
+Apply ruleset anyway?</BWT_MissingModsWarning>
+  <BWT_Apply>Apply</BWT_Apply>
   <BWT_RuleBuilder_ManageRulesetsClassic>Manage Rulesets (classic)...</BWT_RuleBuilder_ManageRulesetsClassic>
   <BWT_RuleBuilder_Back>Back</BWT_RuleBuilder_Back>
   <BWT_RuleBuilder_EditingRulesFor>Editing rules for {0}</BWT_RuleBuilder_EditingRulesFor>

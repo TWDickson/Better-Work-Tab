@@ -19,6 +19,7 @@ namespace Better_Work_Tab.Features
         public bool ResetBeforeApplying = true;
         public List<WorkAssignmentRule> Rules = new List<WorkAssignmentRule>();
         public bool IsDefault = false;
+        public bool IsGlobal = true;
         public List<int> PriorityOrder = new List<int>();
         private static List<WorkTypeDef> cachedWorkTypes;
 
@@ -96,6 +97,9 @@ namespace Better_Work_Tab.Features
 
             foreach (var rule in GetRulesInPriorityOrder())
             {
+                if (rule.Parameters?.GetMissingModRequirements().Count > 0)
+                    continue;
+
                 foreach (var worktype in allWorkTypes)
                 {
 
@@ -150,6 +154,7 @@ namespace Better_Work_Tab.Features
         public void ExposeData()
         {
             Scribe_Values.Look(ref IsDefault, "IsDefault", false);
+            Scribe_Values.Look(ref IsGlobal, "IsGlobal", true);
             Scribe_Values.Look(ref Name, "Name");
             Scribe_Values.Look(ref ResetBeforeApplying, "ResetBeforeApplying");
             Scribe_Collections.Look(ref Rules, "Rules", LookMode.Deep);
@@ -166,8 +171,24 @@ namespace Better_Work_Tab.Features
             //                                                                                              VVV Never let this be true for a copy because it will be impossible to delete!
             var copy = new WorkAssignmentRuleset((Name + " (Copy)"), Rules.ListFullCopy(), ResetBeforeApplying, false);
             copy.PriorityOrder = PriorityOrder?.ToList() ?? new List<int>();
+            copy.IsGlobal = IsGlobal;
             copy.EnsurePriorityOrder();
             return copy;
+        }
+
+        /// <summary>
+        /// Returns all rules that have at least one condition requiring a mod that is not currently active.
+        /// </summary>
+        public List<(WorkAssignmentRule Rule, List<string> MissingMods)> GetRulesWithMissingDeps()
+        {
+            var result = new List<(WorkAssignmentRule, List<string>)>();
+            foreach (var rule in Rules)
+            {
+                var missing = rule.Parameters?.GetMissingModRequirements();
+                if (missing != null && missing.Count > 0)
+                    result.Add((rule, missing));
+            }
+            return result;
         }
 
         /// <summary>

@@ -131,37 +131,49 @@ namespace Better_Work_Tab.UI.RuleBuilder
             DrawRulesetDropdownWithRename(dropdownRect);
 
             // Right-side buttons — widths sized from text so nothing clips.
-            // Layout (right → left): [+ New] [Edit?] [▼/▲ Preview]
+            // Layout (right → left): [+ New] [Preview] [Rename?] [Global/Local?] [Duplicate?]
             const float btnH = 28f;
             const float btnPad = 16f;
             const float btnGap = 6f;
             Text.Font = GameFont.Small;
 
-            string newLabel = "+ " + "BWT_New".Translate();
+            string newLabel     = "+ " + "BWT_New".Translate();
             string previewLabel = (_showPreview ? "BWT_PreviewHide" : "BWT_PreviewShow").Translate();
-            string editLabel = "BWT_Rename".Translate();
+            string editLabel    = "BWT_Rename".Translate();
+            string dupLabel     = "BWT_DuplicateRuleset".Translate();
 
-            float newW = Mathf.Max(70f, Text.CalcSize(newLabel).x + btnPad);
+            float newW     = Mathf.Max(70f, Text.CalcSize(newLabel).x + btnPad);
             float previewW = Mathf.Max(80f, Text.CalcSize(previewLabel).x + btnPad);
-            float editW = Mathf.Max(60f, Text.CalcSize(editLabel).x + btnPad);
+            float editW    = Mathf.Max(60f, Text.CalcSize(editLabel).x + btnPad);
+            float dupW     = Mathf.Max(80f, Text.CalcSize(dupLabel).x + btnPad);
 
-            Rect newButtonRect = new Rect(rect.xMax - newW - btnGap, rect.y + 6f, newW, btnH);
+            Rect newButtonRect     = new Rect(rect.xMax - newW - btnGap, rect.y + 6f, newW, btnH);
+            Rect previewButtonRect = new Rect(newButtonRect.x - previewW - btnGap, rect.y + 6f, previewW, btnH);
+
+            // Anchor for optional buttons that only appear for non-default rulesets
+            float nextX = previewButtonRect.x;
 
             if (_state.SelectedRuleset != null && !_state.SelectedRuleset.IsDefault)
             {
-                Rect editButtonRect = new Rect(newButtonRect.x - editW - btnGap, rect.y + 6f, editW, btnH);
+                Rect editButtonRect = new Rect(nextX - editW - btnGap, rect.y + 6f, editW, btnH);
                 if (RWWidgets.ButtonText(editButtonRect, editLabel))
                     OpenRenameDialog(_state.SelectedRuleset);
 
-                Rect previewButtonRect = new Rect(editButtonRect.x - previewW - btnGap, rect.y + 6f, previewW, btnH);
-                DrawPreviewToggleButton(previewButtonRect);
-            }
-            else
-            {
-                Rect previewButtonRect = new Rect(newButtonRect.x - previewW - btnGap, rect.y + 6f, previewW, btnH);
-                DrawPreviewToggleButton(previewButtonRect);
+                Rect globalButtonRect = new Rect(editButtonRect.x - 80f - btnGap, rect.y + 6f, 80f, btnH);
+                DrawGlobalToggleButton(globalButtonRect, _state.SelectedRuleset);
+
+                nextX = globalButtonRect.x;
             }
 
+            // Duplicate is available for all rulesets, including defaults
+            if (_state.SelectedRuleset != null)
+            {
+                Rect dupButtonRect = new Rect(nextX - dupW - btnGap, rect.y + 6f, dupW, btnH);
+                if (RWWidgets.ButtonText(dupButtonRect, dupLabel))
+                    DuplicateSelectedRuleset();
+            }
+
+            DrawPreviewToggleButton(previewButtonRect);
             if (RWWidgets.ButtonText(newButtonRect, newLabel))
                 CreateNewRuleset();
 
@@ -225,7 +237,8 @@ namespace Better_Work_Tab.UI.RuleBuilder
                 string countSuffix = previewResult.HasData
                     ? $"  ({previewResult.MatchedPawns.Count}/{previewResult.Pawns.Count})"
                     : "";
-                string optionLabel = local.Name + (local.IsDefault ? " *" : "") + countSuffix;
+                string badge = local.IsDefault ? " *" : (!local.IsGlobal ? " [L]" : "");
+                string optionLabel = local.Name + badge + countSuffix;
 
                 options.Add(new FloatMenuOption(optionLabel, () =>
                 {
@@ -274,11 +287,49 @@ namespace Better_Work_Tab.UI.RuleBuilder
                 new List<WorkAssignmentParameters>(),
                 resetBeforeApplying: true,
                 isDefault: false);
+            newRuleset.IsGlobal = false;
 
             rulesets.Add(newRuleset);
             _state.SelectedRuleset = newRuleset;
             BetterWorkTabMod.Settings.CurrentRuleset = newRuleset;
             BetterWorkTabMod.Settings.Write();
+        }
+
+        private void DuplicateSelectedRuleset()
+        {
+            if (_state.SelectedRuleset == null) return;
+
+            var rulesets = BetterWorkTabMod.Settings.SavedRulesets;
+            var copy = _state.SelectedRuleset.Copy();
+            copy.IsGlobal = false;
+
+            rulesets.Add(copy);
+            _state.SelectedRuleset = copy;
+            BetterWorkTabMod.Settings.CurrentRuleset = copy;
+            BetterWorkTabMod.Settings.Write();
+        }
+
+        private void DrawGlobalToggleButton(Rect rect, WorkAssignmentRuleset ruleset)
+        {
+            bool isGlobal = ruleset.IsGlobal;
+            string label = isGlobal
+                ? "BWT_GlobalRuleset".Translate()
+                : "BWT_LocalRuleset".Translate();
+            string tooltip = isGlobal
+                ? "BWT_GlobalRuleset_Tooltip".Translate()
+                : "BWT_LocalRuleset_Tooltip".Translate();
+
+            var oldColor = GUI.color;
+            GUI.color = isGlobal ? new Color(0.5f, 0.85f, 0.5f) : new Color(0.85f, 0.75f, 0.4f);
+
+            if (RWWidgets.ButtonText(rect, label))
+            {
+                ruleset.IsGlobal = !ruleset.IsGlobal;
+                BetterWorkTabMod.Settings.Write();
+            }
+
+            GUI.color = oldColor;
+            TooltipHandler.TipRegion(rect, tooltip);
         }
 
         // ── Three-column editor ───────────────────────────────────────────────
