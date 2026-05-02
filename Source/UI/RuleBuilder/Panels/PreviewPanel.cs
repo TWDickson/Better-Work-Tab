@@ -35,7 +35,6 @@ namespace Better_Work_Tab.UI.RuleBuilder.Panels
         private RulesetPreviewResult _openingResult;
         private WorkAssignmentRuleset _openingForRuleset;
 
-
         private bool _showAllWorkTypes = true;
         private Vector2 _scrollPosition;
 
