@@ -37,23 +37,23 @@
 <BWT_Priority_Desc>The priority to set the work type to. (Vanilla always assigns 3.)</BWT_Priority_Desc>
 <BWT_Worktype_Desc>If assigned, this will be the only work type this rule applies to.</BWT_Worktype_Desc>
 <BWT_AllowOverwritingHigherPriority_Desc>By default the highest priority is kept. This allows later rules to overwrite higher priority.</BWT_AllowOverwritingHigherPriority_Desc>
-<BWT_HasHighestSkill_Desc>Only assign if this pawn has the highest skill. Applies to multiple pawns if tied. (Vanilla assigns one random starting pawn to every work type.)</BWT_HasHighestSkill_Desc>
-<BWT_SkipIfAnotherPawnAssigned_Desc>If another pawn is assigned, do not apply to the current pawn.</BWT_SkipIfAnotherPawnAssigned_Desc>
+<BWT_HasHighestSkill_Desc>Only assign if this pawn has the highest average relevant skill for this work type. All tied pawns also qualify.</BWT_HasHighestSkill_Desc>
+<BWT_SkipIfAnotherPawnAssigned_Desc>Skip this pawn if any other pawn already has this work type assigned at any priority level.</BWT_SkipIfAnotherPawnAssigned_Desc>
 <BWT_IsPregnant_Desc>Only apply if the pawn is pregnant.</BWT_IsPregnant_Desc>
 <BWT_IsCapableOfViolence_Desc>Only apply if the pawn is capable of violence.</BWT_IsCapableOfViolence_Desc>
-<BWT_AssignToPawnWithFewestWorkPriorities_Desc>Only assign to the pawn who has the fewest assigned priorities. Applies to multiple if tied. (This needs to be double checked).</BWT_AssignToPawnWithFewestWorkPriorities_Desc>
-<BWT_HasChildOnMap_Desc>Only apply if the pawn has a child of learning age on the map.</BWT_HasChildOnMap_Desc>
-<BWT_IsNaturalAlwaysAssign_Desc>Only assign if Vanilla tags the work type as an "always assign" work type. (Vanilla always assigns these.)</BWT_IsNaturalAlwaysAssign_Desc>
-<BWT_RandomIfMultiple_Desc>If multiple pawns were assigned the work type, choose one at random to assign.</BWT_RandomIfMultiple_Desc>
-<BWT_IgnoreIfWorktypeNonexistent_Desc>Only assign this worktype if it exists. (Used for modded worktypes.)</BWT_IgnoreIfWorktypeNonexistent_Desc>
-<BWT_IsTopXSkill_Desc>Only assign if the work type is one of the pawn's top X skills. (Vanilla automatically assigns the top 6 skills.)</BWT_IsTopXSkill_Desc>
-<BWT_IsNthBestPawn_Desc>Only assign if the pawn is Nth best at this work type. It must be exact.</BWT_IsNthBestPawn_Desc>
-<BWT_IsNthBestSkill_Desc>Only assign if the work type is this pawn's Nth best skill. It must be exact.</BWT_IsNthBestSkill_Desc>
-<BWT_LimitNumberOfWorktypes_Desc>Only assign if the pawn DOES NOT already have this many work types assigned.</BWT_LimitNumberOfWorktypes_Desc>
-<BWT_SkipIfPriorityForThisWorktypeAreadyAssigned_Desc>Only assign if this work type has not already been assigned. This may be exactly the same as skipIfAnotherPawnAssigned.</BWT_SkipIfPriorityForThisWorktypeAreadyAssigned_Desc>
-<BWT_PassionLevel_Desc>Only assign if the pawn's passion level for the worktype is exactly this number.</BWT_PassionLevel_Desc>
-<BWT_SkillLevelGreaterThan_Desc>Only assign if the pawn's skill in the worktype is greater than this number. (Vanilla assigns skills greater than 5 to starting pawns.)</BWT_SkillLevelGreaterThan_Desc>
-<BWT_SkillLevelLessThan_Desc>Only assign if the pawn's skill in the worktype is less than this number. </BWT_SkillLevelLessThan_Desc>
+<BWT_AssignToPawnWithFewestWorkPriorities_Desc>Only assign to the pawn who currently has the fewest active work type priorities. If multiple pawns tie, only one is assigned.</BWT_AssignToPawnWithFewestWorkPriorities_Desc>
+<BWT_HasChildOnMap_Desc>Only assign if the pawn has a biological child of any age below adult (including babies and toddlers) on the current map.</BWT_HasChildOnMap_Desc>
+<BWT_IsNaturalAlwaysAssign_Desc>Restrict this rule to work types that RimWorld marks as always active (e.g., firefighting, basic work). The rule is skipped for all other work types.</BWT_IsNaturalAlwaysAssign_Desc>
+<BWT_RandomIfMultiple_Desc>If multiple pawns match this rule's conditions, randomly assign the work type to just one of them.</BWT_RandomIfMultiple_Desc>
+<BWT_IgnoreIfWorktypeNonexistent_Desc>Skip this rule silently if the target work type does not exist. Useful for rules that reference modded work types.</BWT_IgnoreIfWorktypeNonexistent_Desc>
+<BWT_IsTopXSkill_Desc>Only assign if this work type ranks within the pawn's top X work types by average relevant skill, excluding always-active and disabled work types. (Vanilla assigns the top 6 by default.)</BWT_IsTopXSkill_Desc>
+<BWT_IsNthBestPawn_Desc>Only assign if the pawn ranks Nth among all colonists for this work type by average relevant skill. Pawns tied at that rank all qualify.</BWT_IsNthBestPawn_Desc>
+<BWT_IsNthBestSkill_Desc>Only assign if this work type is the pawn's Nth best by average relevant skill. Work types tied at that rank all qualify.</BWT_IsNthBestSkill_Desc>
+<BWT_LimitNumberOfWorktypes_Desc>Only assign if the pawn has fewer than X work types currently active. Acts as a cap on the total number of assigned work types for this pawn.</BWT_LimitNumberOfWorktypes_Desc>
+<BWT_SkipIfPriorityForThisWorktypeAreadyAssigned_Desc>Skip if another pawn already holds this exact priority level for this work type. Unlike "Skip if another pawn assigned", this only blocks a specific priority, not any assignment.</BWT_SkipIfPriorityForThisWorktypeAreadyAssigned_Desc>
+<BWT_PassionLevel_Desc>Only assign if the pawn's highest passion among this work type's relevant skills exactly matches the selected level (None, Minor, or Major).</BWT_PassionLevel_Desc>
+<BWT_SkillLevelGreaterThan_Desc>Only assign if the average of the pawn's relevant skills for this work type is strictly greater than this value.</BWT_SkillLevelGreaterThan_Desc>
+<BWT_SkillLevelLessThan_Desc>Only assign if the average of the pawn's relevant skills for this work type is strictly less than this value.</BWT_SkillLevelLessThan_Desc>
 <BWT_MoveSpeedGreaterThan_Desc>You should never see this, but if you do it's because I need to update the tooltip to say 'Only assign if the pawn's move speed is greater than this number.'</BWT_MoveSpeedGreaterThan_Desc>
 <BWT_MoveSpeedLessThan_Desc>You should never see this, but if you do it's because I need to update the tooltip to say 'Only assign if the pawn's move speed is less than this number.'</BWT_MoveSpeedLessThan_Desc>
 <BWT_Gender_Desc>Only assign to pawns of this gender.</BWT_Gender_Desc>
