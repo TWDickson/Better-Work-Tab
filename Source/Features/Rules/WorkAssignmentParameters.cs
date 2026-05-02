@@ -146,6 +146,25 @@ namespace Better_Work_Tab.Features.Rules
         /// </summary>
         public List<string> ActiveConditions = new List<string>();
 
+        /// <summary>
+        /// Returns the display names of mods required by this rule's conditions that are not currently active.
+        /// An empty list means all requirements are satisfied.
+        /// </summary>
+        public List<string> GetMissingModRequirements()
+        {
+            var missing = new List<string>();
+
+            if ((Xenotype != null || !string.IsNullOrEmpty(XenotypeString)) && !ModsConfig.BiotechActive)
+                missing.Add("Biotech");
+
+            if ((RequiredIdeoRole != null || !string.IsNullOrEmpty(RequiredIdeoRoleString)) && !ModsConfig.IdeologyActive)
+                missing.Add("Ideology");
+
+            if (!string.IsNullOrEmpty(ColonyGroupName) && !ModSupport.ModSupportManager.IsLTOColonyGroupsActive())
+                missing.Add("[LTO] Colony Groups");
+
+            return missing;
+        }
 
         public WorkAssignmentParameters(string ruleName = "", 
             int priority = 0, 

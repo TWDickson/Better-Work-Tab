@@ -5,6 +5,7 @@ using Better_Work_Tab.UI;
 using Better_Work_Tab.UI.RuleBuilder;
 using RimWorld;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Verse;
 using Verse.Sound;
@@ -60,19 +61,30 @@ namespace Better_Work_Tab.UI
                     overrideTextAnchor: TextAnchor.MiddleLeft))
             {
                 SoundDefOf.Tick_Low.PlayOneShotOnCamera();
-                // Rulesets are now local-only (not synced in multiplayer)
                 if (curRuleset != null)
                 {
                     System.Action applyAction = () =>
                     {
                         if (curRuleset.ResetBeforeApplying)
-                        {
                             WorkAssignmentRuleset.SetAllToZero();
-                        }
                         curRuleset.ApplyAutoAssignments();
                     };
 
-                    if (settings.warnOnApplyRuleset)
+                    var missingDepsRules = curRuleset.GetRulesWithMissingDeps();
+                    if (missingDepsRules.Count > 0)
+                    {
+                        string modList = string.Join("\n", missingDepsRules
+                            .SelectMany(r => r.MissingMods)
+                            .Distinct()
+                            .Select(m => "  • " + m));
+
+                        Find.WindowStack.Add(Dialog_MessageBox.CreateConfirmation(
+                            "BWT_MissingModsWarning".Translate(modList),
+                            applyAction,
+                            destructive: false,
+                            title: "BWT_Apply".Translate()));
+                    }
+                    else if (settings.warnOnApplyRuleset)
                     {
                         ConfirmApplyWithResetWarning("Apply ruleset?", applyAction, (val) =>
                         {

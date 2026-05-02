@@ -200,12 +200,19 @@ namespace Better_Work_Tab.UI.RuleBuilder.Panels
                 var rule = _visibleRules[i];
                 Rect rowRect = new Rect(0f, yPos, viewRect.width, RuleRowHeight);
 
-                int matchCount = _matchCalculator.CountMatches(
+                var missingMods = rule.Parameters?.GetMissingModRequirements();
+                bool hasMissingDeps = missingMods != null && missingMods.Count > 0;
+
+                int matchCount = hasMissingDeps ? 0 : _matchCalculator.CountMatches(
                     rule,
                     state.SelectedWorkType,
                     GetCurrentPawns());
 
                 bool isSelected = state.SelectedRule == rule;
+
+                var oldColor = GUI.color;
+                if (hasMissingDeps) GUI.color = Color.gray;
+
                 var action = RuleRowWidget.Draw(
                     rowRect,
                     rule,
@@ -213,6 +220,14 @@ namespace Better_Work_Tab.UI.RuleBuilder.Panels
                     matchCount,
                     isSelected,
                     state.SelectedRuleset?.IsDefault ?? false);
+
+                GUI.color = oldColor;
+
+                if (hasMissingDeps)
+                {
+                    string modList = string.Join(", ", missingMods);
+                    TooltipHandler.TipRegion(rowRect, "BWT_RuleDisabledMissingMod".Translate(modList));
+                }
 
                 switch (action)
                 {

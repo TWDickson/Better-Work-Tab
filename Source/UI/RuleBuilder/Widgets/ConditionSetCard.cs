@@ -82,8 +82,11 @@ namespace Better_Work_Tab.UI.RuleBuilder.Widgets
 
         private static void DrawHeader(Rect rect, WorkAssignmentRule rule, int matchCount, bool isReadOnly)
         {
+            var missingMods = rule.Parameters?.GetMissingModRequirements();
+            bool hasMissingDeps = missingMods != null && missingMods.Count > 0;
+
             // Handle double-click rename
-            if (!isReadOnly && Mouse.IsOver(rect) && Event.current.type == EventType.MouseDown && Event.current.clickCount == 2)
+            if (!isReadOnly && !hasMissingDeps && Mouse.IsOver(rect) && Event.current.type == EventType.MouseDown && Event.current.clickCount == 2)
             {
                 Event.current.Use();
                 string currentName = rule.Name ?? "";
@@ -94,7 +97,7 @@ namespace Better_Work_Tab.UI.RuleBuilder.Widgets
             }
 
             Text.Anchor = TextAnchor.MiddleLeft;
-            GUI.color = RuleBuilderConstants.LabelColor;
+            GUI.color = hasMissingDeps ? Color.gray : RuleBuilderConstants.LabelColor;
 
             string displayName = string.IsNullOrEmpty(rule.Name)
                 ? ConditionNameGenerator.Generate(rule.Parameters)
@@ -103,8 +106,17 @@ namespace Better_Work_Tab.UI.RuleBuilder.Widgets
             RWWidgets.Label(rect, displayName);
 
             Text.Anchor = TextAnchor.MiddleRight;
-            GUI.color = RuleBuilderConstants.SuccessColor;
-            RWWidgets.Label(rect, $"({matchCount})");
+            if (hasMissingDeps)
+            {
+                GUI.color = Color.gray;
+                string modList = string.Join(", ", missingMods);
+                RWWidgets.Label(rect, "BWT_RuleDisabledMissingMod".Translate(modList));
+            }
+            else
+            {
+                GUI.color = RuleBuilderConstants.SuccessColor;
+                RWWidgets.Label(rect, $"({matchCount})");
+            }
 
             Text.Anchor = TextAnchor.UpperLeft;
             GUI.color = Color.white;

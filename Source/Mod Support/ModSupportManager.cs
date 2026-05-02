@@ -78,6 +78,14 @@ namespace Better_Work_Tab.ModSupport
             return false;
         }
 
+        public static bool IsLTOColonyGroupsActive()
+        {
+            foreach (var module in _activeModules)
+                if (module is LTOColonyGroupsSupport)
+                    return true;
+            return false;
+        }
+
         public static List<string> GetColonyGroupNames()
         {
             foreach (var module in _activeModules)
