@@ -231,8 +231,7 @@ namespace Better_Work_Tab.UI
                 var local = wl;
                 options.Add(new FloatMenuOption(local.RenamableLabel, () =>
                 {
-                    // This logic is now reliable because the list order matches.
-                    workloadSaver.CurrentWorklist = local;
+                    workloadSaver.SelectWorklist(local);
                     MainTabWindowUtility.NotifyAllPawnTables_PawnsChanged();
                     SoundDefOf.Tick_Low.PlayOneShotOnCamera();
                 }));
@@ -262,9 +261,7 @@ namespace Better_Work_Tab.UI
                     var local = wl;
                     options.Add(new FloatMenuOption("Delete " + local.RenamableLabel, () =>
                     {
-                        workloadSaver.SavedWorklists.Remove(local);
-                        if (workloadSaver.CurrentWorklist == local)
-                            workloadSaver.CurrentWorklist = null;
+                        workloadSaver.DeleteWorklist(local);
 
                         MainTabWindowUtility.NotifyAllPawnTables_PawnsChanged();
                         SoundDefOf.Tick_Low.PlayOneShotOnCamera();
@@ -286,9 +283,8 @@ namespace Better_Work_Tab.UI
             }
             while (workloadSaver.SavedWorklists.Any(w => w != null && w.RenamableLabel == name));
 
-            var wl = new Worklist(name);
-            workloadSaver.SavedWorklists.Add(wl);
-            workloadSaver.CurrentWorklist = wl;
+            workloadSaver.CreateWorklist(name);
+            var wl = workloadSaver.CurrentWorklist;
 
             // immediately prompt for a nicer name
             Find.WindowStack.Add(new Dialog_RenameWorkload(wl));
